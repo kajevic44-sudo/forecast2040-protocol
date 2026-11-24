@@ -1,0 +1,13 @@
+model,t_cluster,p_stepdown,rank
+holt,3.180664,0.009350,1
+drift,2.045886,0.169000,2
+ar1_growth,1.650077,0.324150,3
+ridge_lags,-1.427461,0.420050,4
+combination,-0.919002,0.786750,5
+ar1_levels,-0.793204,0.837250,6
+gradient_boosting,0.452640,0.938600,7
+random_forest,-0.518604,0.959150,8
+holt_damped,0.044446,0.962950,9
+arima_111,0.459809,0.970700,10
+ridge_ml,-0.238567,0.979300,11
+loglinear,0.153310,0.979800,12

@@ -1,0 +1,14 @@
+model,free_coefficients,tuned_hyperparameters,features,note,coefficients_per_15_obs
+naive,0,0,0,"last value, no estimated quantity",0.0000
+drift,2,0,1,intercept and slope on the time index,0.1333
+loglinear,2,0,1,intercept and slope in logs,0.1333
+ar1_growth,2,0,1,intercept and one autoregressive coefficient,0.1333
+ar1_levels,2,0,1,intercept and one autoregressive coefficient,0.1333
+holt,2,2,1,"two states, alpha and beta chosen on a 9 by 5 grid",0.1333
+holt_damped,2,3,1,"two states, alpha, beta and phi on a 9 by 4 by 5 grid",0.1333
+arima_111,3,0,1,three structural parameters plus the innovation variance,0.2000
+combination,0,0,3,"equal weights over drift, Holt and ridge, no estimated weight",0.0000
+ridge_lags,4,0,3,"intercept and three lag coefficients, penalty fixed at 1.0",0.2667
+ridge_ml,7,0,6,"intercept, three lags, two growth rates and a time index",0.4667
+random_forest,0,3,6,"400 trees, leaf size 2, at most 17 leaves per tree",0.0000
+gradient_boosting,0,3,6,"300 trees of depth 2, four leaves per tree",0.0000

@@ -1,0 +1,3 @@
+run_utc,series,observations,first_year,last_year,origins,selected,mase,rmse,dm_p_vs_naive,horizons,min_train,projection_to
+2026-11-24T08:30:00+00:00,destatis_pkw_neuzulassungen_jahre,35,1991,2025,15,ridge_lags,1.2839,335728.61,0.0051,5,15,2040
+2026-11-24T08:30:00+00:00,vw_group_china_deliveries,39,1987,2025,21,holt,7.7778,926826.51,0.9615,5,20,2040

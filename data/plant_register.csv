@@ -1,0 +1,44 @@
+node,longitude,latitude,tier
+Accra,-0.1900,5.6000,market
+Alexandria,29.9200,31.2000,market
+Antwerp,4.4000,51.2200,processing
+Atacama,-69.1300,-23.8600,extraction
+Bayan Obo,109.9700,41.7700,extraction
+Belgrade,20.4600,44.7900,market
+Bengaluru,77.5900,12.9700,components
+Bratislava,17.1100,48.1500,assembly
+Bremerhaven,8.5800,53.5400,market
+Brunswick,10.5200,52.2700,components
+Brussels,4.3500,50.8500,assembly
+Casablanca,-7.5900,33.5700,market
+Changchun,125.3200,43.8200,assembly
+Chattanooga,-85.3100,35.0500,assembly
+Gyor,17.6300,47.6900,assembly
+Hefei,117.2300,31.8200,assembly
+Ingolstadt,11.4300,48.7700,assembly
+Istanbul,28.9800,41.0100,market
+Jadar,19.1000,44.5500,extraction
+Jakarta,106.8500,-6.2100,processing
+Kassel,9.4900,51.3100,components
+Lagos,3.3800,6.5200,market
+Martorell,1.9300,41.4700,assembly
+Mlada Boleslav,14.9000,50.4100,assembly
+Munich,11.5800,48.1400,assembly
+Neckarsulm,9.2200,49.1900,assembly
+Palmela,-8.9000,38.5700,assembly
+Pamplona,-1.6400,42.8100,assembly
+Perth,115.8600,-31.9500,extraction
+Poznan,16.9300,52.4100,assembly
+Puebla,-98.2000,19.0400,assembly
+Riyadh,46.6800,24.7100,market
+Salzgitter,10.3300,52.1500,components
+Sao Paulo,-46.6300,-23.5500,assembly
+Seoul,126.9800,37.5700,components
+Shanghai,121.4700,31.2300,components
+Stuttgart,9.1800,48.7800,assembly
+Taipei,121.5700,25.0300,components
+Tel Aviv,34.7800,32.0900,components
+Uitenhage,25.4000,-33.7700,assembly
+Urumqi,87.6200,43.8300,assembly
+Wolfsburg,10.7900,52.4200,assembly
+Zwickau,12.5000,50.7200,assembly
