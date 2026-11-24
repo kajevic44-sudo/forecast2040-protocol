@@ -13,7 +13,7 @@ authors:
     country: DE
 version: 1.0.0
 date-released: 2026-11-24
-repository-code: "https://github.com/kajevic44/forecast2040"
+repository-code: "https://github.com/kajevic44-sudo/forecast2040-protocol"
 keywords:
   - forecast evaluation
   - rolling origin
