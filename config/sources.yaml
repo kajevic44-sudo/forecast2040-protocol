@@ -1,0 +1,298 @@
+# Registry of machine-readable sources.
+# Only sources that respond without an API key are listed here. Sources that
+# need registration are tracked in the workbook and enabled once a key exists.
+#
+# id           unique, used as file name in data/raw
+# kind         which fetcher to use, must exist in sources/registry.py
+# url_template placeholders are filled from params
+# cadence      how often the series changes, used to decide refresh policy
+# licence      short note on redistribution, needed for the data availability statement
+
+sources:
+  - id: worldbank_deu_gdp
+    label: Germany, GDP current USD
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: NY.GDP.MKTP.CD
+    cadence: annual
+    licence: CC BY 4.0
+
+  - id: worldbank_deu_gdp_pc
+    label: Germany, GDP per capita current USD
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: NY.GDP.PCAP.CD
+    cadence: annual
+    licence: CC BY 4.0
+
+  - id: worldbank_deu_pop
+    label: Germany, population total
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: SP.POP.TOTL
+    cadence: annual
+    licence: CC BY 4.0
+
+  - id: eurostat_ip_de
+    label: Germany, industrial production index, manufacturing, seasonally adjusted
+    kind: eurostat
+    url_template: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/{dataset}
+    params:
+      dataset: sts_inpr_m
+      query:
+        freq: M
+        geo: DE
+        nace_r2: C
+        s_adj: SCA
+        unit: I21
+    cadence: monthly
+    licence: CC BY 4.0
+
+  - id: eurostat_unemp_de
+    label: Germany, unemployment rate, seasonally adjusted
+    kind: eurostat
+    url_template: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/{dataset}
+    params:
+      dataset: une_rt_m
+      query:
+        freq: M
+        geo: DE
+        s_adj: SA
+        age: TOTAL
+        sex: T
+        unit: PC_ACT
+    cadence: monthly
+    licence: CC BY 4.0
+
+  # Stooq now serves a JavaScript proof-of-work challenge instead of a CSV.
+  # Kept in the registry as documentation of the attempt; disabled for scripts.
+  # The same series is available from the Yahoo source below.
+  - id: stooq_vw
+    label: Volkswagen AG preference share, daily close
+    enabled: false
+    kind: stooq
+    url_template: https://stooq.com/q/d/l/?s={ticker}&i=d
+    params:
+      ticker: vw
+    cadence: daily
+    licence: free for private use, verify before publication
+
+  - id: stooq_bmw
+    label: BMW AG, daily close
+    enabled: false
+    kind: stooq
+    url_template: https://stooq.com/q/d/l/?s={ticker}&i=d
+    params:
+      ticker: bmw
+    cadence: daily
+    licence: free for private use, verify before publication
+
+  - id: yahoo_vow3
+    label: Volkswagen AG preference share, Yahoo chart, ten years
+    kind: yahoo
+    url_template: https://query1.finance.yahoo.com/v8/finance/chart/{ticker}
+    params:
+      ticker: VOW3.DE
+      range: 10y
+      interval: 1d
+    cadence: daily
+    licence: Yahoo terms, research use
+
+  - id: yahoo_tsla
+    label: Tesla Inc, Yahoo chart, ten years
+    kind: yahoo
+    url_template: https://query1.finance.yahoo.com/v8/finance/chart/{ticker}
+    params:
+      ticker: TSLA
+      range: 10y
+      interval: 1d
+    cadence: daily
+    licence: Yahoo terms, research use
+  - id: worldbank_deu_rd
+    label: Germany, research and development expenditure, percent of GDP
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: GB.XPD.RSDV.GD.ZS
+    cadence: annual
+    licence: CC BY 4.0
+  - id: worldbank_deu_manuf
+    label: Germany, manufacturing value added, current USD
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: NV.IND.MANF.CD
+    cadence: annual
+    licence: CC BY 4.0
+  - id: worldbank_deu_co2pc
+    label: Germany, CO2 emissions per capita
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: EN.GHG.CO2.PC.CE.AR5
+    cadence: annual
+    licence: CC BY 4.0
+  - id: worldbank_deu_age65
+    label: Germany, population aged 65 and over, percent
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: SP.POP.65UP.TO.ZS
+    cadence: annual
+    licence: CC BY 4.0
+  - id: worldbank_deu_papers
+    label: Germany, scientific and technical journal articles
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: IP.JRN.ARTC.SC
+    cadence: annual
+    licence: CC BY 4.0
+  - id: worldbank_deu_unemp_ilo
+    label: Germany, unemployment rate, ILO modelled
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: SL.UEM.TOTL.ZS
+    cadence: annual
+    licence: CC BY 4.0
+  - id: worldbank_deu_inflation
+    label: Germany, inflation, consumer prices, annual percent
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: FP.CPI.TOTL.ZG
+    cadence: annual
+    licence: CC BY 4.0
+  - id: worldbank_deu_exports
+    label: Germany, exports of goods and services, percent of GDP
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: NE.EXP.GNFS.ZS
+    cadence: annual
+    licence: CC BY 4.0
+  - id: worldbank_deu_fdi
+    label: Germany, foreign direct investment, net inflows, current USD
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: BX.KLT.DINV.CD.WD
+    cadence: annual
+    licence: CC BY 4.0
+  - id: worldbank_deu_tertiary
+    label: Germany, tertiary school enrolment, gross percent
+    kind: worldbank
+    url_template: https://api.worldbank.org/v2/country/{country}/indicator/{indicator}
+    params:
+      country: DEU
+      indicator: SE.TER.ENRR
+    cadence: annual
+    licence: CC BY 4.0
+  - id: fred_cpi
+    label: United States, consumer price index, all urban consumers
+    kind: csv
+    params: {}
+    url_template: https://fred.stlouisfed.org/graph/fredgraph.csv?id=CPIAUCSL
+    cadence: monthly
+    licence: public domain, Federal Reserve Bank of St. Louis
+  - id: fred_indpro
+    label: United States, industrial production index
+    kind: csv
+    params: {}
+    url_template: https://fred.stlouisfed.org/graph/fredgraph.csv?id=INDPRO
+    cadence: monthly
+    licence: public domain, Federal Reserve Bank of St. Louis
+  - id: fred_unrate
+    label: United States, unemployment rate
+    kind: csv
+    params: {}
+    url_template: https://fred.stlouisfed.org/graph/fredgraph.csv?id=UNRATE
+    cadence: monthly
+    licence: public domain, Federal Reserve Bank of St. Louis
+  - id: fred_dgs10
+    label: United States, ten year treasury constant maturity
+    kind: csv
+    params: {}
+    url_template: https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10
+    cadence: monthly
+    licence: public domain, Federal Reserve Bank of St. Louis
+  - id: fred_oil_brent
+    label: Brent crude oil, Europe spot price, USD per barrel
+    kind: csv
+    params: {}
+    url_template: https://fred.stlouisfed.org/graph/fredgraph.csv?id=DCOILBRENTEU
+    cadence: monthly
+    licence: public domain, Federal Reserve Bank of St. Louis
+  - id: fred_total_vehicle_sales
+    label: United States, total vehicle sales, millions of units, annual rate
+    kind: csv
+    params: {}
+    url_template: https://fred.stlouisfed.org/graph/fredgraph.csv?id=TOTALSA
+    cadence: monthly
+    licence: public domain, Federal Reserve Bank of St. Louis
+  - id: yahoo_bmw_de
+    label: BMW AG ordinary share, Yahoo chart
+    kind: yahoo
+    url_template: https://query1.finance.yahoo.com/v8/finance/chart/{ticker}
+    params:
+      ticker: BMW.DE
+      range: 10y
+      interval: 1d
+    cadence: daily
+    licence: vendor terms, not redistributable, research use only
+  - id: yahoo_mbg_de
+    label: Mercedes-Benz Group AG, Yahoo chart
+    kind: yahoo
+    url_template: https://query1.finance.yahoo.com/v8/finance/chart/{ticker}
+    params:
+      ticker: MBG.DE
+      range: 10y
+      interval: 1d
+    cadence: daily
+    licence: vendor terms, not redistributable, research use only
+  - id: yahoo_pah3_de
+    label: Porsche Automobil Holding SE, Yahoo chart
+    kind: yahoo
+    url_template: https://query1.finance.yahoo.com/v8/finance/chart/{ticker}
+    params:
+      ticker: PAH3.DE
+      range: 10y
+      interval: 1d
+    cadence: daily
+    licence: vendor terms, not redistributable, research use only
+  - id: yahoo_toyota
+    label: Toyota Motor Corporation, Yahoo chart
+    kind: yahoo
+    url_template: https://query1.finance.yahoo.com/v8/finance/chart/{ticker}
+    params:
+      ticker: 7203.T
+      range: 10y
+      interval: 1d
+    cadence: daily
+    licence: vendor terms, not redistributable, research use only
+  - id: yahoo_byd
+    label: BYD Company Limited, Yahoo chart
+    kind: yahoo
+    url_template: https://query1.finance.yahoo.com/v8/finance/chart/{ticker}
+    params:
+      ticker: 1211.HK
+      range: 10y
+      interval: 1d
+    cadence: daily
+    licence: vendor terms, not redistributable, research use only
