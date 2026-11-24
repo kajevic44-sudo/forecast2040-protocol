@@ -382,6 +382,8 @@ Table 6. The same comparison under four variance estimators, German series.
 | 4 | -1.874 | 0.0819 | -2.911 | 0.0114 | 0.2196 | 0.24 |
 | 5 | -2.331 | 0.0352 | -3.009 | 0.0094 | 0.3232 | 0.29 |
 
+Note: the fourth estimator pools the five horizons within each origin and clusters by origin. The mean differential is minus 70,470 vehicles, the statistic is minus 1.427 with fourteen degrees of freedom, and the p value is 0.175.
+
 A moving block bootstrap with blocks of two adjacent origins, which preserves the dependence between neighbouring origins, gives p 0.385 at four years and 0.488 at five. The weaker the dependence assumption, the weaker the evidence, and the range runs from 0.009 to 0.488. The columns do not agree, and the disagreement is the result. A paper that reported only the third column would claim significance at four and five years. A paper that reported only the first or the fourth would claim none. The honest statement is that the point estimate is stable and the inference is not: the winner is better at every horizon by a margin that grows with the horizon, and whether that margin is distinguishable from zero depends on an assumption about the variance that fifteen observations cannot settle.
 
 ### 7.6 What the checks do not cover
