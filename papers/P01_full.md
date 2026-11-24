@@ -243,7 +243,7 @@ The interval is empirical. The relative error of the selected model is computed 
 
 ### 5.8 The Lean module
 
-The deterministic skeleton of the split is written in Lean 4.36.0 without Mathlib. The module defines the training index set at an origin, the expanding window and the fixed length window, and it proves nine theorems. Four carry the property that matters: every index in the training set is strictly below the origin (`trainIdx_lt`), the origin is never in the training set (`origin_not_in_train`), the expanding window is nested (`trainIdx_mono`), and a fixed length window ending before the origin never reaches it (`rollIdx_lt`). Selection is a fold over the candidate list (`selectBest`), and `selectBest_det` states that it is a function. The module compiles in seconds and has no dependencies. It does not formalise estimation, asymptotics, the projection or the interval, and the paper does not claim that it does. The distinction matters for how the rest of the paper should be read. The kernel certifies that no observation dated at or after the origin can enter the training set and that the selection is a deterministic function of the backtest output. It says nothing about whether the loss is the right loss, whether the test has the right size, or whether the projection is accurate. A reader who wants a proof of the forecast will not find one in the module, and the paper does not offer one.
+The deterministic skeleton of the split is written in Lean 4.36.0 without Mathlib. The module defines the training index set at an origin, the expanding window and the fixed length window, and it proves nine theorems. Four carry the property that matters: every index in the training set is strictly below the origin (`trainIdx_lt`), the origin is never in the training set (`origin_not_in_train`), the expanding window is nested (`trainIdx_mono`), and a fixed length window ending before the origin never reaches it (`rollIdx_lt`). Selection is a fold over the candidate list (`selectBest`), and `selectBest_det` states that it is a function. The module compiles in seconds and has no dependency on Mathlib (The Mathlib Community 2020). It does not formalise estimation, asymptotics, the projection or the interval, and the paper does not claim that it does. The distinction matters for how the rest of the paper should be read. The kernel certifies that no observation dated at or after the origin can enter the training set and that the selection is a deterministic function of the backtest output. It says nothing about whether the loss is the right loss, whether the test has the right size, or whether the projection is accurate. A reader who wants a proof of the forecast will not find one in the module, and the paper does not offer one.
 
 ### 5.9 Pseudocode
 
@@ -308,7 +308,7 @@ Table 4. Ridge on lagged growth against naive, by horizon, Germany.
 
 The profile is the finding. The point estimate is better at every horizon, and the gain grows from 20,859 vehicles at one year, 7.6 percent of the naive error, to 127,569 vehicles at five years, 29.9 percent. The pre-specified statistic rejects equal accuracy at four years, minus 2.911 with a p value of 0.011, and at five years, minus 3.009 with 0.009. It does not reject at one to three years, where the statistic is below one in absolute value.
 
-The bootstrap column is the reason the paper does not stop there. When the fifteen origins are resampled and the long-run variance is estimated again in each resample, the same statistic produces p values of 0.220 at four years and 0.323 at five. The asymptotic p value treats the estimated variance as known. With fifteen observations and three autocovariances the variance is itself a random quantity with a wide distribution, and the bootstrap says so. The pre-specified test is reported because the protocol fixed it, the bootstrap is reported because the protocol is supposed to be auditable, and the two disagree.
+The bootstrap is the standard remedy when the variance is estimated rather than known (Efron and Tibshirani 1993), and the column is the reason the paper does not stop there. When the fifteen origins are resampled and the long-run variance is estimated again in each resample, the same statistic produces p values of 0.220 at four years and 0.323 at five. The asymptotic p value treats the estimated variance as known. With fifteen observations and three autocovariances the variance is itself a random quantity with a wide distribution, and the bootstrap says so. The pre-specified test is reported because the protocol fixed it, the bootstrap is reported because the protocol is supposed to be auditable, and the two disagree.
 
 The direction of the overlap correction explains part of the disagreement. The usual warning is that ignoring overlap understates the variance and overstates significance, which assumes positively autocorrelated differentials. Here the estimated autocovariances are negative: at four years the first two are minus 14.8 billion and minus 11.8 billion, so the corrected variance is about a quarter of the zero-lag variance and the statistic rises from minus 1.874 to minus 3.800 before the small sample factor shrinks it to minus 2.911. The differential alternates with the cycle, with a large favourable value at the 2009 origin and a large unfavourable one at 2020, and alternation is negative autocorrelation. A variance estimated from three such autocovariances is a fragile object, and the bootstrap is the check that makes the fragility visible.
 
@@ -416,8 +416,6 @@ The protocol, the thirteen candidates, the rolling-origin loop and the interval 
 
 ## References
 
-Andersen, Torben G., Dobrislav Dobrev, and Ernst Schaumburg. 2012. "Jump-robust volatility estimation using nearest neighbor truncation." *Journal of Econometrics* 169 (1): 75-93. https://doi.org/10.1016/j.jeconom.2012.01.011
-
 Armstrong, J. Scott. 2001. *Principles of Forecasting: A Handbook for Researchers and Practitioners*. Boston: Kluwer Academic Publishers.
 
 Baker, Monya. 2016. "1,500 scientists lift the lid on reproducibility." *Nature* 533 (7604): 452-454. https://doi.org/10.1038/533452a
@@ -468,8 +466,6 @@ Klier, Thomas H., and James Rubenstein. 2008. *Who Really Made Your Car? Restruc
 
 Kraftfahrt-Bundesamt. 2025. *Fahrzeugzulassungen, FZ 28: Elektrische Antriebe*. Accessed 24 November 2026. https://www.kba.de.
 
-Lawrence, Michael, Paul Goodwin, Marcus O'Connor, and Dilek Önkal. 2006. "Judgmental forecasting: A review of progress over the last 25years." *International Journal of Forecasting* 22 (3): 493-518. https://doi.org/10.1016/j.ijforecast.2006.03.007
-
 Makridakis, Spyros, and Michèle Hibon. 2000. "The M3-Competition: results, conclusions and implications." *International Journal of Forecasting* 16 (4): 451-476. https://doi.org/10.1016/S0169-2070(00)00057-1
 
 Makridakis, Spyros, Evangelos Spiliotis, and Vassilios Assimakopoulos. 2020. "The M4 Competition: 100,000 time series and 61 forecasting methods." *International Journal of Forecasting* 36 (1): 54-74. https://doi.org/10.1016/j.ijforecast.2019.04.014
@@ -488,13 +484,11 @@ Romano, Joseph P., and Michael Wolf. 2005. "Exact and Approximate Stepdown Metho
 
 Simmons, Joseph P., Leif D. Nelson, and Uri Simonsohn. 2011. "False-Positive Psychology." *Psychological Science* 22 (11): 1359-1366. https://doi.org/10.1177/0956797611417632
 
-Statistisches Bundesamt. 2026. *GENESIS-Online, table 46131: Passenger Car Registrations*. Accessed 24 November 2026. https://www-genesis.destatis.de.
+Statistisches Bundesamt (Destatis). 2026. *GENESIS-Online, table 46131: Passenger Car Registrations*. Accessed 24 November 2026. https://www-genesis.destatis.de.
 
 Sturgeon, T., J. Van Biesebroeck, and G. Gereffi. 2008. "Value chains, networks and clusters: reframing the global automotive industry." *Journal of Economic Geography* 8 (3): 297-321. https://doi.org/10.1093/jeg/lbn007
 
 Tashman, Leonard J.. 2000. "Out-of-sample tests of forecasting accuracy: an analysis and review." *International Journal of Forecasting* 16 (4): 437-450. https://doi.org/10.1016/S0169-2070(00)00065-0
-
-Teece, David J.. 2010. "Business Models, Business Strategy and Innovation." *Long Range Planning* 43 (2-3): 172-194. https://doi.org/10.1016/j.lrp.2009.07.003
 
 Tetlock, Philip E. 2005. *Expert Political Judgment: How Good Is It? How Can We Know?* Princeton: Princeton University Press.
 
