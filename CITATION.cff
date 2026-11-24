@@ -11,6 +11,7 @@ authors:
     given-names: Armin
     city: Ingolstadt
     country: DE
+    orcid: "https://orcid.org/0009-0004-1241-8313"
 version: 1.0.0
 date-released: 2026-11-24
 repository-code: "https://github.com/kajevic44-sudo/forecast2040-protocol"
