@@ -416,6 +416,10 @@ The German series is Destatis GENESIS table 46131, downloaded on 24 November 202
 
 The protocol, the thirteen candidates, the rolling-origin loop and the interval are implemented in Python in `thesis/analysis/`. The Lean 4 module is `lean_poc/Protocol.lean`, with a checking harness in `lean_poc/Check.lean`, built with Lean 4.36.0 and no Mathlib. The repository is public at github.com/kajevic44-sudo/forecast2040-protocol, archived at Zenodo under DOI 10.5281/zenodo.24516636, with one commit per unit and a README that reproduces Tables 2 and 3 with one command.
 
+## Declaration of generative AI and AI-assisted technologies in the writing process
+
+During the preparation of this manuscript, the author used AI-assisted tools for language editing, for improving English phrasing and linguistic clarity, and for limited technical assistance in reviewing and supporting the preparation of the analytical code. These tools supported the efficiency of the research workflow and did not replace the author's independent scientific work. The research objectives, the methodology, the analytical framework, the interpretation of the data and the scientific conclusions were determined and critically reviewed by the author. The author independently evaluated the analytical outputs, verified every reported result against the underlying data, and takes full responsibility for the accuracy, originality and integrity of the manuscript and its findings.
+
 ## References
 
 Armstrong, J. Scott. 2001. *Principles of Forecasting: A Handbook for Researchers and Practitioners*. Boston: Kluwer Academic Publishers.
