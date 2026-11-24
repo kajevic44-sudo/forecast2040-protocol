@@ -1,0 +1,27 @@
+cff-version: 1.2.0
+message: "If you use this protocol or the archived results, cite the repository and the paper."
+title: "Forecast 2040: pre-registered rolling-origin protocol for German passenger car registrations and long-horizon automotive demand"
+abstract: >-
+  Code, data and results for a pre-registered rolling-origin forecast comparison of
+  thirteen models on German passenger car registrations, with the information split
+  checked in Lean 4 and a projection to 2040.
+type: software
+authors:
+  - family-names: Kajevic
+    given-names: Armin
+    city: Ingolstadt
+    country: DE
+version: 1.0.0
+date-released: 2026-11-24
+repository-code: "https://github.com/kajevic44/forecast2040"
+keywords:
+  - forecast evaluation
+  - rolling origin
+  - pre-registration
+  - MASE
+  - Diebold-Mariano
+  - Lean 4
+  - reproducibility
+  - formal verification
+  - forecasting protocol
+  - automotive demand

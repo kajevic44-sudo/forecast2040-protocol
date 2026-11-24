@@ -1,0 +1,33 @@
+{
+  "title": "Forecast 2040: pre-registered rolling-origin protocol for German passenger car registrations and long-horizon automotive demand",
+  "description": "<p>Code, data and results for a pre-registered rolling-origin forecast comparison of thirteen models on annual German passenger car registrations (1991-2025), with the information split checked in Lean 4 and a projection to 2040. The archive contains the raw series, the backtest output, the metrics file, the Diebold-Mariano matrix, the Lean module and the scripts that rebuild every table in the paper. The repository documents the protocol, the negative result on the Chinese series and the disagreement between the pre-specified test, a bootstrap and a family-wise correction.</p>",
+  "upload_type": "software",
+  "publication_date": "2026-11-24",
+  "version": "1.0.0",
+  "access_right": "open",
+  "creators": [
+    {
+      "name": "Kajevic, Armin",
+      "affiliation": "Independent researcher, Ingolstadt"
+    }
+  ],
+  "keywords": [
+    "forecast evaluation",
+    "rolling origin",
+    "pre-registration",
+    "MASE",
+    "Diebold-Mariano",
+    "reproducibility",
+    "formal verification",
+    "forecasting protocol",
+    "automotive demand",
+    "Lean 4"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/kajevic44/forecast2040",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}
