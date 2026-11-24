@@ -14,6 +14,11 @@ authors:
 version: 1.0.0
 date-released: 2026-11-24
 repository-code: "https://github.com/kajevic44-sudo/forecast2040-protocol"
+doi: "10.5281/zenodo.24516637"
+identifiers:
+  - type: doi
+    value: "10.5281/zenodo.24516637"
+    description: "Archived release v1.0.0 at Zenodo"
 keywords:
   - forecast evaluation
   - rolling origin

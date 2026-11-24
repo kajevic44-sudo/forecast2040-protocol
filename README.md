@@ -1,5 +1,7 @@
 # Forecast 2040
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24516637.svg)](https://doi.org/10.5281/zenodo.24516637)
+
 Pre-registered rolling-origin protocol for German passenger car registrations and long-horizon automotive demand.
 
 This repository holds the code, the data and the results behind the paper *Fixing the model before the backtest: a pre-registered protocol with a machine-checked split for long-horizon automotive demand* by Armin Kajevic.
@@ -74,7 +76,7 @@ The German series is Destatis GENESIS table 46131, downloaded on 24 November 202
 
 ## Citation
 
-If you use the protocol, cite the paper and the archive. The metadata are in `CITATION.cff`; the Zenodo deposit carries the DOI of release v1.0.0.
+If you use the protocol, cite the paper and the archive. The metadata are in `CITATION.cff`. Release v1.0.0 is deposited at Zenodo under DOI 10.5281/zenodo.24516637, which resolves to https://doi.org/10.5281/zenodo.24516637.
 
 ## Licence
 
