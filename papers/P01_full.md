@@ -410,11 +410,11 @@ The contribution is the protocol, not the number. A reader who disagrees with th
 
 ## Data availability
 
-The German series is Destatis GENESIS table 46131, downloaded on 24 November 2026 and stored in `thesis/data/raw/destatis_pkw_neuzulassungen_jahre.csv`, SHA256 47f9609c55769afd926c356501161afa8bcdee61b073567955826e9cd1235c37. The Chinese series is stored in `thesis/data/raw/vw_group_china_deliveries.csv`. The backtest output, the metrics file and the Diebold and Mariano matrix are in `thesis/data/model/`; the metrics file used in Table 3 has SHA256 3e408618afedf7357dab24573527e955250a98d76b6aad5c8c96c26ab6457362. All series are public and none is edited in place. The frozen release of the data, the code and the results is deposited at Zenodo under DOI 10.5281/zenodo.24516637.
+The German series is Destatis GENESIS table 46131, downloaded on 24 November 2026 and stored in `thesis/data/raw/destatis_pkw_neuzulassungen_jahre.csv`, SHA256 47f9609c55769afd926c356501161afa8bcdee61b073567955826e9cd1235c37. The Chinese series is stored in `thesis/data/raw/vw_group_china_deliveries.csv`. The backtest output, the metrics file and the Diebold and Mariano matrix are in `thesis/data/model/`; the metrics file used in Table 3 has SHA256 3e408618afedf7357dab24573527e955250a98d76b6aad5c8c96c26ab6457362. All series are public and none is edited in place. The frozen release of the data, the code and the results is deposited at Zenodo under DOI 10.5281/zenodo.24516636, which resolves to the latest version.
 
 ## Code availability
 
-The protocol, the thirteen candidates, the rolling-origin loop and the interval are implemented in Python in `thesis/analysis/`. The Lean 4 module is `lean_poc/Protocol.lean`, with a checking harness in `lean_poc/Check.lean`, built with Lean 4.36.0 and no Mathlib. The repository is public at github.com/kajevic44-sudo/forecast2040-protocol, archived at Zenodo under DOI 10.5281/zenodo.24516637, with one commit per unit and a README that reproduces Tables 2 and 3 with one command.
+The protocol, the thirteen candidates, the rolling-origin loop and the interval are implemented in Python in `thesis/analysis/`. The Lean 4 module is `lean_poc/Protocol.lean`, with a checking harness in `lean_poc/Check.lean`, built with Lean 4.36.0 and no Mathlib. The repository is public at github.com/kajevic44-sudo/forecast2040-protocol, archived at Zenodo under DOI 10.5281/zenodo.24516636, with one commit per unit and a README that reproduces Tables 2 and 3 with one command.
 
 ## References
 

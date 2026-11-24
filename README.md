@@ -1,6 +1,6 @@
 # Forecast 2040
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24516637.svg)](https://doi.org/10.5281/zenodo.24516637)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24516636.svg)](https://doi.org/10.5281/zenodo.24516636)
 
 Pre-registered rolling-origin protocol for German passenger car registrations and long-horizon automotive demand.
 
@@ -76,7 +76,7 @@ The German series is Destatis GENESIS table 46131, downloaded on 24 November 202
 
 ## Citation
 
-If you use the protocol, cite the paper and the archive. The metadata are in `CITATION.cff`. Release v1.0.0 is deposited at Zenodo under DOI 10.5281/zenodo.24516637, which resolves to https://doi.org/10.5281/zenodo.24516637.
+If you use the protocol, cite the paper and the archive. The metadata are in `CITATION.cff`. The archive is deposited at Zenodo under DOI 10.5281/zenodo.24516636, which resolves to https://doi.org/10.5281/zenodo.24516636 and covers every released version. The first release, v1.0.0, has its own version DOI, 10.5281/zenodo.24516637.
 
 ## Licence
 
