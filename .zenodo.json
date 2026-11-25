@@ -1,9 +1,7 @@
 {
-  "title": "Forecast 2040: pre-registered rolling-origin protocol for German passenger car registrations and long-horizon automotive demand",
-  "description": "<p>Code, data and results for a pre-registered rolling-origin forecast comparison of thirteen models on annual German passenger car registrations (1991-2025), with the information split checked in Lean 4 and a projection to 2040. The archive contains the raw series, the backtest output, the metrics file, the Diebold-Mariano matrix, the Lean module and the scripts that rebuild every table in the paper. The repository documents the protocol, the negative result on the Chinese series and the disagreement between the pre-specified test, a bootstrap and a family-wise correction.</p>",
+  "title": "Forecast 2040: pre-registered forecasting, event studies and ownership data for the German automotive industry",
+  "description": "<p>Code, data and results for a pre-registered research programme on the German automotive industry. The archive contains the rolling-origin forecast comparison of thirteen models on a panel of seventeen European markets, with the information split checked in Lean 4 and a conformal projection to 2040; the event study of the Volkswagen divestment programme, with a benchmark audit and four post hoc extensions; and the ownership register and capital cycle evidence for German industry. Every table and figure is rebuilt from the raw series by the scripts in the repository, and every input file carries a SHA256 hash in the manuscript.</p>",
   "upload_type": "software",
-  "publication_date": "2026-11-24",
-  "version": "1.0.1",
   "access_right": "open",
   "creators": [
     {
@@ -15,11 +13,11 @@
     "forecast evaluation",
     "rolling origin",
     "pre-registration",
-    "MASE",
-    "Diebold-Mariano",
+    "event study",
+    "divestiture",
+    "ownership",
     "reproducibility",
     "formal verification",
-    "forecasting protocol",
     "automotive demand",
     "Lean 4"
   ],

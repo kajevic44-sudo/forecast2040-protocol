@@ -1,4 +1,8 @@
 # Changelog
+## v1.3.11, 26 November 2026
+- Removed the hardcoded version 1.0.1 and publication date 2026-11-24 from `.zenodo.json`, which had overridden the release tag and date in every Zenodo archive since the first deposit. Zenodo now takes the version and the date from the GitHub release.
+- Replaced the P01-specific archive title and description with a repository level title and description that cover the forecasting protocol, the P05 event study and the P10 ownership data.
+- Updated the P05 data availability statement to tag v1.3.11 and rebuilt the PDF and DOCX. No result or number changed.
 ## v1.3.10, 26 November 2026
 - Rewrote P05 as version 2.2, 46 pages and 47 references, and retitled it from engineering subsidiaries to engineering businesses because IAV is 50 percent owned and is not a subsidiary.
 - Added a one page executive summary before the abstract, a confidence table, a key numbers table, a table of what would change the conclusion, a limitations table and a glossary.
