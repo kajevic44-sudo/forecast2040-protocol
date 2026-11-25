@@ -58,6 +58,11 @@ Every number in P10 is produced by one script, which writes the three output tab
 
 ```bash
 python tools/p10_analysis.py
+```
+
+Every number in P05 is produced by one script, which downloads the three benchmark series once, writes the four output tables and draws both figures:
+
+```bash
 python tools/p05_analysis.py
 ```
 
@@ -66,7 +71,6 @@ The two figures of P10 are rebuilt with:
 ```bash
 python tools/figures_capital.py
 python tools/fig_p10_ownership.py
-python tools/fig_p10_ownership.py
 ```
 
 The manuscripts are rebuilt from Markdown with:
@@ -74,6 +78,7 @@ The manuscripts are rebuilt from Markdown with:
 ```bash
 python tools/render_pdf.py "$PWD/papers/P01_full.md" "$PWD/papers/build/P01_full.pdf"
 python tools/render_pdf.py "$PWD/papers/P10_full.md" "$PWD/papers/build/P10_full.pdf"
+python tools/render_pdf.py "$PWD/papers/P05_full.md" "$PWD/papers/build/P05_full.pdf"
 ```
 
 The Lean module builds with Lean 4.36.0 and has no dependency on Mathlib:
