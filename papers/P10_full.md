@@ -399,7 +399,7 @@ The paper states all three and does not choose. What it can say is that the timi
 
 The connection to the companion work on demand forecasting is direct. A forecast of German passenger car registrations to 2040 is a forecast of a market in which the marginal producer is controlled by holders who do not exit, and the error distribution of that forecast is therefore not the error distribution of a competitive market. The capital cycle says that capacity leaves when the return falls; the ownership map says that capacity may not leave, because the holder can wait. A forecast that ignores the second is a forecast of the wrong model.
 
-The practical implication is that the interval around a long horizon forecast should be wider than the historical error distribution suggests, because the mechanism that would normally restore the return is weakened. The companion paper reports an empirical interval from 2,563,157.85 to 3,689,022.75 registrations for 2040 and describes it as a corridor for planning; the present paper supplies a reason why the corridor should not be narrowed by an argument from mean reversion.
+The practical implication is that the interval around a long horizon forecast should be wider than the historical error distribution suggests, because the mechanism that would normally restore the return is weakened. The companion paper (Kajevic 2026) reports a 90 percent corridor from 0.61 to 5.10 million registrations for 2040, around a point forecast of 2.86 million, and describes it as a corridor for planning; the present paper supplies a reason why the corridor should not be narrowed by an argument from mean reversion.
 
 ### 8.4 Ownership as a variable
 
@@ -433,7 +433,7 @@ The paper reports the disappearance rather than hiding it, because the disappear
 
 ## Data availability
 
-The German macrohistory extract is stored in `data/historical/tidy/jst_germany.csv`, SHA256 9037f8602d88f5fcb1ee62526f50a3acda86f4412101500c51aaa9982575902a, and derives from the JST Macrohistory Database release R6 (Jorda, Schularick and Taylor 2017), which is public. The drawdown record is `data/historical/tidy/de_equity_drawdowns.csv`, SHA256 f55d2fc8b7fa1345a5e08d40ede12a419017fc5a4c3f2b5cd8fc662e073de9e8. The ownership register is `docs/OWNERSHIP.md`, with the positions at 31 December 2025 taken from the Volkswagen Group annual report. The three output tables are `data/model/p10_lag_correlations.csv`, SHA256 67818fe3b0e4e4dc14e99c09003e09aa40e47d860838d4e0734856c763b03d66, `data/model/p10_subsamples.csv`, SHA256 61a828455c93e10a2608a544be3e864bb57e141235e3c2c215980f3fe3f9beea, and `data/model/p10_exclusions.csv`, SHA256 ab073e2902da024d27001f6746fe63ee22bbf91c831d40a22f8f609b4930f403. The project is archived at Zenodo under the concept DOI 10.5281/zenodo.24516636, which resolves to the latest published version of the archive. The release that contains this paper is tagged v1.1.0 in the public repository, and the repository holds the code, the data and the results under the licence recorded in the archive.
+The German macrohistory extract is stored in `data/historical/tidy/jst_germany.csv`, SHA256 9037f8602d88f5fcb1ee62526f50a3acda86f4412101500c51aaa9982575902a, and derives from the JST Macrohistory Database release R6 (Jorda, Schularick and Taylor 2017), which is public. The drawdown record is `data/historical/tidy/de_equity_drawdowns.csv`, SHA256 f55d2fc8b7fa1345a5e08d40ede12a419017fc5a4c3f2b5cd8fc662e073de9e8. The ownership register is `docs/OWNERSHIP.md`, with the positions at 31 December 2025 taken from the Volkswagen Group annual report. The three output tables are `data/model/p10_lag_correlations.csv`, SHA256 67818fe3b0e4e4dc14e99c09003e09aa40e47d860838d4e0734856c763b03d66, `data/model/p10_subsamples.csv`, SHA256 61a828455c93e10a2608a544be3e864bb57e141235e3c2c215980f3fe3f9beea, and `data/model/p10_exclusions.csv`, SHA256 ab073e2902da024d27001f6746fe63ee22bbf91c831d40a22f8f609b4930f403. The project is archived at Zenodo under the concept DOI 10.5281/zenodo.24516636, which resolves to the latest published version of the archive. The release that contains this paper is tagged v1.3.7 in the public repository, and the repository holds the code, the data and the results under the licence recorded in the archive.
 
 ## Code availability
 
@@ -517,6 +517,7 @@ Hirschman, Albert O. 1970. Exit, Voice, and Loyalty: Responses to Decline in Fir
 Jensen, Michael C., and William H. Meckling. 1976. "Theory of the Firm: Managerial Behavior, Agency Costs and Ownership Structure." Journal of Financial Economics 3 (4): 305-360.
 
 Jorda, Oscar, Moritz Schularick, and Alan M. Taylor. 2017. "Macrofinancial History and the New Business Cycle Facts." NBER Macroeconomics Annual 31: 213-263.
+Kajevic, Armin. 2026. "The Benchmark Is Hard to Beat on This Panel: A Time-Stamped Protocol with a Machine-Checked Split for Long-Horizon Car Demand." Working paper, GitHub. https://github.com/kajevic44-sudo/forecast2040-protocol.
 
 Kotter, Jason, and Ugur Lel. 2011. "Friends or Foes? Target Selection Decisions of Sovereign Wealth Funds and Their Consequences." Journal of Financial Economics 101 (2): 360-381.
 

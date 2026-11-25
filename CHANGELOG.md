@@ -1,4 +1,8 @@
 # Changelog
+## v1.3.7, 25 November 2026
+- Corrected P10's cross-reference to the companion forecasting paper: the old single-market interval from 2.56 to 3.69 million is replaced by the version 2.5 conformal corridor from 0.61 to 5.10 million around a point forecast of 2.86 million.
+- Added the companion paper to the P10 reference list and updated the data availability tag to v1.3.7.
+- Rebuilt the P10 PDF and DOCX, 28 pages and 41 references.
 ## v1.3.6, 25 November 2026
 - Rewrote the P01 cover letter for version 2.5: the new title, the seventeen-country panel, thirteen candidate models, 216 origins and 13,610 errors, the timestamped protocol, the negative result, two-way clustering with the Monte Carlo study, the conformal 2040 corridor and the narrow Lean claim.
 - Removed the single-market description, the nine theorems, the six tables, the missing figures and the Chinese control that no longer match the paper.
