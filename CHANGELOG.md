@@ -1,4 +1,9 @@
 # Changelog
+## v1.3.4, 25 November 2026
+- Removed the Kraftfahrt-Bundesamt FZ 28 reference, which pointed to electric powertrains while the paper uses the Destatis total registration series.
+- Added the linear-scaling sensitivity for the 2040 band: the half-width would triple and the lower bound would fall below zero, which is a further argument for the square root rule.
+- Stated that the Monte Carlo components are calibrated on the same panel, so the exercise validates the dependence structure rather than the level of the loss.
+- Rebuilt the manuscript, 43 pages.
 ## v1.3.3, 25 November 2026
 - Added a second Monte Carlo design with a country-origin effect estimated from the panel, 0.516 in standard deviation. The two-way test remains conservative at 3.7 percent; the independent and one-way tests remain far above nominal. Both designs are reported in Table 6 and in the abstract.
 - Made the Holm statement symmetric: no candidate is significantly better than the benchmark, and three are significantly worse.
