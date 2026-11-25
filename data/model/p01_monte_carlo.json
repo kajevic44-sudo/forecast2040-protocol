@@ -1,24 +1,33 @@
-[
-  {
-    "scenario": "null",
-    "mu": 0.0,
-    "reps": 4000,
-    "size_iid": 0.6815,
-    "size_cluster": 0.304,
-    "size_twoway": 0.04825,
-    "size_boot": 0.35275,
-    "size_hln5": 0.543,
-    "mean_differential": 0.003348537399425809
+{
+  "components": {
+    "models": 12,
+    "sd_country": 0.31168465882034824,
+    "sd_origin": 0.3004181989134403,
+    "sd_cell": 0.8289722047613501
   },
-  {
-    "scenario": "alternative",
-    "mu": -0.1,
-    "reps": 4000,
-    "size_iid": 0.71325,
-    "size_cluster": 0.377,
-    "size_twoway": 0.076,
-    "size_boot": 0.42225,
-    "size_hln5": 0.5725,
-    "mean_differential": -0.09434681947299267
-  }
-]
+  "reps": 4000,
+  "table": [
+    {
+      "scenario": "null",
+      "mu": 0.0,
+      "reps": 4000,
+      "size_iid": 0.6375,
+      "size_cluster": 0.1585,
+      "size_twoway": 0.04675,
+      "size_boot": 0.20125,
+      "size_hln5": 0.592,
+      "mean_differential": 0.0025463525605768722
+    },
+    {
+      "scenario": "alternative",
+      "mu": -0.1,
+      "reps": 4000,
+      "size_iid": 0.745,
+      "size_cluster": 0.2895,
+      "size_twoway": 0.10775,
+      "size_boot": 0.3505,
+      "size_hln5": 0.66975,
+      "mean_differential": -0.09629624166507628
+    }
+  ]
+}

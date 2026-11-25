@@ -101,21 +101,29 @@ def _tree_levels(y: np.ndarray, kind: str) -> np.ndarray:
 
 
 def _holt(y: np.ndarray, damped: bool) -> np.ndarray:
-    best = (np.inf, 0.5, 0.1)
+    best = (np.inf, 0.5, 0.1, 0.9)
+    phis = (0.80, 0.85, 0.90, 0.95, 0.98) if damped else (1.0,)
     for alpha in np.arange(0.1, 1.0, 0.1):
         for beta in np.arange(0.1, 1.0, 0.1):
-            try:
-                fit = Holt(y, damped_trend=damped, initialization_method="estimated").fit(
-                    smoothing_level=alpha, smoothing_trend=beta, optimized=False
-                )
-                sse = float(np.sum(np.asarray(fit.fittedvalues) - y) ** 2)
-            except Exception:
-                continue
-            if sse < best[0]:
-                best = (sse, alpha, beta)
-    _, alpha, beta = best
+            for phi in phis:
+                try:
+                    fit = Holt(y, damped_trend=damped, initialization_method="estimated").fit(
+                        smoothing_level=alpha,
+                        smoothing_trend=beta,
+                        damping_trend=phi if damped else None,
+                        optimized=False,
+                    )
+                    sse = float(np.sum(np.asarray(fit.fittedvalues) - y) ** 2)
+                except Exception:
+                    continue
+                if sse < best[0]:
+                    best = (sse, alpha, beta, phi)
+    _, alpha, beta, phi = best
     fit = Holt(y, damped_trend=damped, initialization_method="estimated").fit(
-        smoothing_level=alpha, smoothing_trend=beta, optimized=False
+        smoothing_level=alpha,
+        smoothing_trend=beta,
+        damping_trend=phi if damped else None,
+        optimized=False,
     )
     return np.asarray(fit.forecast(H), dtype=float)
 
@@ -179,10 +187,12 @@ def evaluate(y: np.ndarray, years: np.ndarray, country: str, models: list[str]) 
         actual = y[origin:origin + H]
         ceiling = 10.0 * float(np.max(y[:origin]))
         for model in models:
+            failed = 0
             try:
                 path = forecast_v1(y[:origin], model)
             except Exception:
                 path = forecast_v1(y[:origin], "drift")
+                failed = 1
             divergent = int(np.any(path <= 0) or np.any(path > ceiling))
             for h in range(1, H + 1):
                 rows.append(
@@ -193,6 +203,7 @@ def evaluate(y: np.ndarray, years: np.ndarray, country: str, models: list[str]) 
                         "model": model,
                         "mase": abs(actual[h - 1] - path[h - 1]) / scale,
                         "divergent": divergent,
+                        "fallback": failed,
                     }
                 )
     return pd.DataFrame(rows)

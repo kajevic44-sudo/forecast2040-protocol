@@ -1,17 +1,22 @@
-"""Monte Carlo study of the three tests used in P01.
+"""Monte Carlo study of the tests used in P01.
 
 The exercise asks which test keeps its nominal size when forecast errors are
 clustered by country and overlap across horizons. Loss differentials are
-generated with a country effect, an origin effect and a horizon effect. The
-same differentials are then tested with an independent t test, with the
-Harvey-Leybourne-Newbold correction at horizon five, and with a country
-clustered statistic. Power is measured under a small negative mean.
+generated with a country effect, an origin effect and a cell effect. The
+variance components are not assumed: they are estimated by the method of
+moments from the observed matrix of loss differentials against the naive
+benchmark, using the median across the twelve challengers. The same
+differentials are then tested with an independent t test, with a one-way
+country cluster statistic, with a two-way country and origin statistic, with
+a country block bootstrap, and with the Harvey-Leybourne-Newbold correction
+at horizon five. Power is measured under a small negative mean.
 
 Author: Armin Kajevic
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import math
 
@@ -24,9 +29,68 @@ REPS = 4000
 COUNTRIES = 17
 ORIGINS = 14
 HORIZONS = 5
-SIGMA_COUNTRY = 0.30
-SIGMA_ORIGIN = 0.50
-SIGMA_CELL = 1.00
+
+# Estimated from the panel by estimate_components(); the values below are the
+# fallback used only if the results file is absent.
+SIGMA_COUNTRY = 0.28
+SIGMA_ORIGIN = 0.24
+SIGMA_CELL = 0.73
+
+
+def estimate_components(path: str = "data/model/p01_panel_results.csv") -> dict:
+    """Method of moments for a crossed country and origin random effects model.
+
+    For each challenger the differential against the naive benchmark is
+    decomposed into a country mean, an origin mean and a residual. The
+    residual variance is corrected for the degrees of freedom used by the two
+    sets of effects, and the two variance components are corrected for the
+    sampling error of the corresponding means.
+    """
+    frame = pd.read_csv(path)
+    frame = frame[frame.divergent == 0]
+    components = []
+    for model in sorted(frame.model.unique()):
+        if model == "naive":
+            continue
+        a = frame[frame.model == model].set_index(["country", "origin_year", "horizon"]).mase
+        b = frame[frame.model == "naive"].set_index(["country", "origin_year", "horizon"]).mase
+        d = (a - b).dropna().rename("d").reset_index()
+        if len(d) < 100:
+            continue
+        d["res"] = (
+            d.d
+            - d.groupby("country").d.transform("mean")
+            - d.groupby("origin_year").d.transform("mean")
+            + d.d.mean()
+        )
+        n = len(d)
+        c = d.country.nunique()
+        t = d.origin_year.nunique()
+        s2 = float(d.res.var(ddof=1)) * n / (n - c - t + 1)
+        cm = d.groupby("country").d.mean()
+        tm = d.groupby("origin_year").d.mean()
+        nc = d.groupby("country").size()
+        nt = d.groupby("origin_year").size()
+        sa = max(float(cm.var(ddof=1)) - float((s2 / nc).mean()), 0.0)
+        sb = max(float(tm.var(ddof=1)) - float((s2 / nt).mean()), 0.0)
+        components.append(
+            {
+                "model": model,
+                "n": n,
+                "mean": float(d.d.mean()),
+                "sd_country": math.sqrt(sa),
+                "sd_origin": math.sqrt(sb),
+                "sd_cell": math.sqrt(s2),
+            }
+        )
+    table = pd.DataFrame(components)
+    summary = {
+        "models": int(len(table)),
+        "sd_country": float(table.sd_country.median()),
+        "sd_origin": float(table.sd_origin.median()),
+        "sd_cell": float(table.sd_cell.median()),
+    }
+    return summary
 
 
 def one_replication(rng: np.random.Generator, mu: float) -> dict:
@@ -87,16 +151,28 @@ def one_replication(rng: np.random.Generator, mu: float) -> dict:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--reps", type=int, default=REPS)
+    parser.add_argument("--out", default="data/model/p01_monte_carlo")
+    args = parser.parse_args()
+
+    global SIGMA_COUNTRY, SIGMA_ORIGIN, SIGMA_CELL
+    comp = estimate_components()
+    SIGMA_COUNTRY = comp["sd_country"]
+    SIGMA_ORIGIN = comp["sd_origin"]
+    SIGMA_CELL = comp["sd_cell"]
+    print("components", {k: round(v, 4) if isinstance(v, float) else v for k, v in comp.items()})
+
     rng = np.random.default_rng(SEED)
     rows = []
     for label, mu in (("null", 0.0), ("alternative", -0.10)):
-        results = [one_replication(rng, mu) for _ in range(REPS)]
+        results = [one_replication(rng, mu) for _ in range(args.reps)]
         frame = pd.DataFrame(results)
         rows.append(
             {
                 "scenario": label,
                 "mu": mu,
-                "reps": REPS,
+                "reps": args.reps,
                 "size_iid": float((frame.p_iid < 0.05).mean()),
                 "size_cluster": float((frame.p_cluster < 0.05).mean()),
                 "size_twoway": float((frame.p_twoway < 0.05).mean()),
@@ -106,9 +182,10 @@ def main() -> None:
             }
         )
     table = pd.DataFrame(rows)
-    table.to_csv("data/model/p01_monte_carlo.csv", index=False)
-    with open("data/model/p01_monte_carlo.json", "w") as handle:
-        json.dump(table.to_dict(orient="records"), handle, indent=2)
+    table.to_csv(f"{args.out}.csv", index=False)
+    payload = {"components": comp, "reps": args.reps, "table": table.to_dict(orient="records")}
+    with open(f"{args.out}.json", "w") as handle:
+        json.dump(payload, handle, indent=2)
     print(table.round(4).to_string(index=False))
 
 

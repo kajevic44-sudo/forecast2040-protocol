@@ -1,4 +1,15 @@
 # Changelog
+## v1.3.2, 25 November 2026
+- Added a full Monte Carlo section with Table 6: size and power of the independent, one-way, two-way, bootstrap and HLN tests. The variance components are now estimated from the observed loss differentials rather than assumed, and every number in the abstract and in Section 5 was updated.
+- Fixed a silent fallback in the first-version replication: damped Holt raised an exception in every call and was replaced by drift, which made the two rows of Table 5 identical. The damping parameter is now estimated, the fallback is recorded, and Table 5 was recomputed.
+- Labelled the divergence rule and the ARIMA correction as post hoc in the abstract and in Section 3.9, and disclosed the different cell counts of the models.
+- Added a common-sample ranking that drops every cell in which any model diverges: 11,960 errors, same order at the top.
+- Corrected Section 6.4: only the random forest is significantly worse after Holm, not the linear trend, the log-linear trend or the six-feature ridge.
+- Corrected the first-version interval from ninety to ninety-five percent, and made the comparison of corridor widths explicit about the nominal level.
+- Added a Germany-only conformal calibration, the 2020 coverage check and the square root evidence from Table A1.
+- Qualified the Lean claim: the module proves the key order and the fold, not the statistical selection, and the Python to Lean link is a specification rather than an extraction.
+- Replaced the unsupported claim that single-market studies are common with a design statement, and reframed the Chinese series as a stress case rather than a held-out control.
+- Rebuilt the manuscript, 42 pages.
 
 ## v1.3.1, 25 November 2026
 

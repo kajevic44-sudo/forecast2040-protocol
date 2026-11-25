@@ -12,7 +12,7 @@ Concept DOI 10.5281/zenodo.24516636
 
 ## Abstract
 
-Forecast comparisons in the automotive literature are usually run on one market and a short evaluation window. This paper asks whether the winner of such a comparison survives when the same protocol is applied to many markets. The protocol fixes the sample, thirteen candidate models, the tuning rules, the scaled loss, the rolling origins, the tests and the interval construction before the panel is evaluated, and the protocol file carries an external cryptographic timestamp. The panel covers seventeen European markets from 1991 to 2024, 539 annual observations, 216 forecast origins and 13,610 usable forecast errors. The naive benchmark wins at every horizon, with a mean absolute scaled error of 1.913 against 1.969 for damped Holt and 2.028 for the theta method, and no candidate beats it after Holm correction. The earlier single-market version, run on Germany alone, had reported an 18.5 percent gain for a flexible model over the same benchmark. That gain disappears on the panel, where the German winner is 5.3 percent worse than the benchmark and the rank correlation between the two evaluations is 0.41. A Monte Carlo study shows why the usual test overstates precision: with a common annual shock, an independent t test rejects a true null in 68 percent of samples and one-way country clustering still rejects in 30 percent, while two-way clustering by country and year holds the size at 4.8 percent. Split conformal intervals calibrated on the first sixty percent of origins cover at least their nominal level at every horizon. The German projection for 2040 is 2.86 million registrations with a 90 percent band from 0.61 to 5.10 million, four times wider than the band in the single-market version. A Lean 4 module proves that the forecast and the scale at an origin depend only on data up to that origin, that any forecaster receiving only the prefix is causal, and that the selection rule returns a unique minimiser. The lesson is uncomfortable and useful: in this class of annual demand series the benchmark is hard to beat, single-market wins are fragile, and a corridor honest enough for planning is much wider than the published one.
+Forecast comparisons in the automotive literature are often run on one market and a short evaluation window. This paper asks whether the winner of such a comparison survives when the same protocol is applied to many markets. The protocol fixes the sample, thirteen candidate models, the tuning rules, the scaled loss, the rolling origins, the tests and the interval construction before the panel is evaluated, and the protocol file carries an external cryptographic timestamp. Two deviations adopted after the first execution, the divergence rule and the ARIMA correction, are labelled post hoc in Section 3.9 and their effect on the sample is reported. The panel covers seventeen European markets from 1991 to 2024, 539 annual observations, 216 forecast origins and 13,610 usable forecast errors. The naive benchmark wins at every horizon, with a mean absolute scaled error of 1.913 against 1.969 for damped Holt and 2.028 for the theta method, and no candidate beats it after Holm correction. The earlier single-market version, run on Germany alone, had reported a 19.5 percent gain for a flexible model over the same benchmark. Re-estimated with the same model set, the German winner gains 18.5 percent; on the panel that model is 5.3 percent worse than the benchmark, and the rank correlation between the two evaluations is 0.41. A Monte Carlo study shows why the usual test overstates precision: with a common annual shock, an independent t test rejects a true null in 64 percent of samples and one-way country clustering still rejects in 16 percent, while two-way clustering by country and year holds the size at 4.7 percent. Split conformal intervals calibrated on the first sixty percent of origins cover at least their nominal level at every horizon. The German projection for 2040 is 2.86 million registrations with a 90 percent band from 0.61 to 5.10 million, four times wider than the 95 percent band in the single-market version. A Lean 4 module proves that the forecast and the scale at an origin depend only on data up to that origin, that any forecaster receiving only the prefix is causal, and that the key order used to break ties in selection has a unique minimum when scores differ. The lesson is uncomfortable and useful: in this class of annual demand series the benchmark is hard to beat, single-market wins are fragile, and a corridor honest enough for planning is much wider than the published one.
 
 Keywords: forecast evaluation, rolling origin, pre-registration, conformal prediction, panel data, automotive demand
 
@@ -30,7 +30,7 @@ That finding is the contribution. It is not a claim that flexible models are use
 
 The paper also repairs the interval. The single-market version reported a 2040 interval from 2.56 to 3.69 million registrations, calibrated on errors at horizons of one to five years and applied to a horizon of fifteen. The panel allows a split conformal calibration by horizon, a check of empirical coverage on held-out origins, and an explicit scaling rule beyond the evaluated horizon. The resulting band is much wider, and the paper argues that the wider band is the correct one. A planning department that uses a corridor of plus or minus four hundred thousand vehicles at a fifteen-year horizon is using a corridor that the data do not support.
 
-The formal part is strengthened as well. The first version proved that the indices used by the training window lie below the origin, a statement that is true and nearly trivial. The new module proves a property of the functions: the forecast and the scale at an origin are invariant to any change in the data after that origin, and the lexicographic selection rule is a total order with a unique minimiser. The Lean 4 kernel checks the proofs, the module contains no unfinished proof, and the axioms it relies on are the three standard ones.
+The formal part is strengthened as well. The first version proved that the indices used by the training window lie below the origin, a statement that is true and nearly trivial. The new module proves a property of the functions: the forecast and the scale at an origin are invariant to any change in the data after that origin, and the lexicographic key order used to break ties is a total order whose fold returns a unique minimum when scores differ. The module does not verify the statistical tests, and the Python implementation is a specification of the same rule rather than code extracted from Lean. The Lean 4 kernel checks the proofs, the module contains no unfinished proof, and the axioms it relies on are the three standard ones.
 
 The paper proceeds as follows. Section 2 reviews the literature on forecast evaluation, multiplicity, reproducibility and formal verification. Section 3 states the protocol, including the models, the loss, the tests and the interval rule, and describes the time stamp and the two deviations that occurred during execution. Section 4 describes the panel and its breaks. Section 5 reports the panel results. Section 6 compares the single-market and panel evaluations and explains why the ranking does not travel. Section 7 reports the Monte Carlo study and the robustness checks. Section 8 builds the 2040 corridor. Section 9 describes the Lean module. Section 10 discusses implications and limitations, and Section 11 concludes.
 
@@ -74,7 +74,7 @@ Planning departments use these series to size capacity, employment and investmen
 
 ### 2.8 The gap
 
-Three gaps follow. Forecast comparisons in this literature are usually single-market and do not report whether the ranking survives a change of sample. The standard errors rarely account for the common shock that affects all units in the same year. The intervals reported for long horizons are calibrated on short horizons and are not checked for coverage. This paper addresses all three: it runs a frozen protocol on seventeen markets, compares the panel ranking with the single-market ranking, and calibrates intervals by horizon with a coverage check and an explicit extrapolation rule.
+Three gaps follow. A forecast comparison run on one market cannot report whether its ranking survives a change of sample. The standard errors rarely account for the common shock that affects all units in the same year. The intervals reported for long horizons are calibrated on short horizons and are not checked for coverage. This paper addresses all three: it runs a frozen protocol on seventeen markets, compares the panel ranking with the single-market ranking, and calibrates intervals by horizon with a coverage check and an explicit extrapolation rule.
 
 ## 3 Protocol
 
@@ -184,7 +184,7 @@ openssl ts -verify -data protocol/p01_protocol.yaml \
   -CAfile protocol/tsa_cacert.pem -untrusted protocol/tsa.crt
 ```
 
-Two deviations occurred. The first is the divergence rule of Section 3.6, added after the first execution. The second concerns the ARIMA model: the first execution specified a constant in levels, which is not identified when the series is differenced once, and the model silently fell back to drift for every origin. The specification was corrected to a constant in the differenced equation, the panel was rerun, and no other model changed. Both deviations are recorded in the repository, and neither changes the ranking at the top: the benchmark leads in both executions.
+Two deviations occurred, and both are post hoc in the strict sense: neither appears in the timestamped protocol file, and both were adopted after the first execution. The first is the divergence rule of Section 3.6, added when one recursive specification produced explosive paths in small markets. The second concerns the ARIMA model: the first execution specified a constant in levels, which is not identified when the series is differenced once, and the model silently fell back to drift for every origin. The specification was corrected to a constant in the differenced equation, the panel was rerun, and no other model changed. Both deviations are recorded in the repository with their dates, and neither changes the ranking at the top: the benchmark leads in both executions.
 
 The single-market results of Section 6 are not covered by the timestamp. They were produced before the protocol was frozen and are reported as stage one, with the date of the earlier version. The timestamp covers the panel evaluation, which had not been run when the token was issued.
 
@@ -287,7 +287,7 @@ Table 4. Loss differentials against the naive benchmark, two-way clustered by co
 
 Two candidates are significantly worse than the benchmark after Holm: drift and ARIMA, at 0.007 and 0.008. The random forest is also rejected at 0.018. The remaining differences are not distinguishable from zero at the familywise level. The two closest challengers, damped Holt and theta, have intervals that include zero by a wide margin.
 
-The comparison between the one-way and two-way clustered p values is instructive even where neither rejects. For damped Holt the one-way value is 0.404 and the two-way value is 0.484; for theta the values are 0.128 and 0.232. The two-way standard error is between a sixth and a quarter larger, and the difference grows with the number of years in which the errors move together. Section 7 shows which of the two is right: in a design calibrated to this panel the one-way procedure rejects a true null in thirty percent of samples, while the two-way procedure holds the size at 4.8 percent.
+The comparison between the one-way and two-way clustered p values is instructive even where neither rejects. For damped Holt the one-way value is 0.404 and the two-way value is 0.484; for theta the values are 0.128 and 0.232. The two-way standard error is between a sixth and a quarter larger, and the difference grows with the number of years in which the errors move together. Section 7 shows which of the two is right: in a design calibrated to this panel the one-way procedure rejects a true null in 15.9 percent of samples, while the two-way procedure holds the size at 4.7 percent.
 
 The model confidence set at ninety percent contains all thirteen candidates. With seventeen clusters and a studentised range, the set cannot exclude any model, including the linear trend that is 36 percent worse than the benchmark. That is not a contradiction of Table 4. The pairwise tests ask whether a specific difference is zero, and they have more power against specific alternatives. The confidence set asks whether a model can be excluded from the set of best models, and with seventeen clusters it cannot. The result is a statement about the limits of the sample, and it is reported rather than hidden.
 
@@ -303,9 +303,9 @@ The forest plot in Figure 4 shows the same heterogeneity in the inferential metr
 
 ![Figure 4. Mean loss differentials against the benchmark with two-way clustered intervals. Negative values would mean that the candidate is better.](../figures/fig_p01_forest.png)
 
-### 5.4 The Chinese control
+### 5.4 The Chinese stress case
 
-On the Chinese deliveries series no candidate beats the benchmark. The scaled error of the naive forecast is 7.78, which is large in absolute terms because the series contains a structural break and a missing year, and the scaled errors of the flexible candidates are between 8 and 15. The result is reported as a negative control: the protocol does not manufacture a winner where the data do not contain one. The large scale is itself informative. It says that the naive scale, computed on a series with a break, is a poor normaliser, and it is the reason the paper reports the scaled loss alongside the unscaled error in the appendix.
+On the Chinese deliveries series no candidate beats the benchmark. The scaled error of the naive forecast is 7.78, which is large in absolute terms because the series contains a structural break and a missing year, and the scaled errors of the flexible candidates are between 8 and 15. The result is a stress case, not a held-out control: the series was already analysed in the first version, so it cannot test the protocol out of sample, but it shows that the protocol does not manufacture a winner where the data contain none. The large scale is itself informative. It says that the naive scale, computed on a series with a break, is a poor normaliser, and it is the reason the paper reports the scaled loss alongside the unscaled error in the appendix.
 
 ## 6 The single-market illusion
 
@@ -313,7 +313,7 @@ On the Chinese deliveries series no candidate beats the benchmark. The scaled er
 
 The first version of this study evaluated thirteen models on German registrations from 1991 to 2025, with origins from 2006 to 2020, horizons from one to five years and the same scaled loss. It reported that a flexible model beat the naive benchmark by about 19 percent, that the improvement grew with the horizon, and that the result survived a battery of robustness checks. The finding was internally consistent: the model was estimated only on training data, the loss was scale free, and the test was corrected for the overlap induced by multi-step forecasts.
 
-The first version also reported a 2040 projection of 3.16 million registrations with an interval from 2.56 to 3.69 million. The interval was calibrated on errors at horizons of one to five years and applied to a horizon of fifteen. That extrapolation was the weakest part of the paper, and the panel makes the weakness visible.
+The first version also reported a 2040 projection of 3.16 million registrations with a ninety-five percent interval from 2.56 to 3.69 million. The interval was calibrated on errors at horizons of one to five years and applied to a horizon of fifteen. That extrapolation was the weakest part of the paper, and the panel makes the weakness visible.
 
 ### 6.2 The same models on two samples
 
@@ -324,20 +324,20 @@ Table 5. The first-version model set on Germany and on the panel.
 | Candidate | Germany | Rank | Panel | Rank | Divergent, percent |
 |:--|--:|--:|--:|--:|--:|
 | AR(1) on levels | 1.292 | 1 | 2.014 | 4 | 0.0 |
-| ridge on three lags | 1.360 | 2 | 2.372 | 9 | 0.9 |
+| ridge on three lags | 1.360 | 2 | 2.372 | 8 | 0.9 |
 | random forest | 1.509 | 3 | 2.004 | 3 | 0.0 |
 | six-feature ridge | 1.549 | 4 | 2.557 | 10 | 5.6 |
 | combination | 1.582 | 5 | 2.185 | 5 | 0.5 |
 | naive | 1.585 | 6 | 1.913 | 1 | 0.0 |
 | ARIMA(1,1,1) | 1.592 | 7 | 2.256 | 6 | 5.1 |
 | log-linear trend | 1.637 | 8 | 2.785 | 13 | 0.0 |
-| gradient boosting | 1.649 | 9 | 2.002 | 2 | 0.0 |
-| drift | 1.655 | 10 | 2.258 | 7 | 3.2 |
-| damped Holt | 1.655 | 10 | 2.258 | 7 | 3.2 |
+| damped Holt | 1.646 | 9 | 2.385 | 9 | 0.9 |
+| gradient boosting | 1.649 | 10 | 2.002 | 2 | 0.0 |
+| drift | 1.655 | 11 | 2.258 | 7 | 3.2 |
 | AR(1) on growth | 1.946 | 12 | 2.717 | 11 | 0.0 |
 | Holt | 2.065 | 13 | 2.774 | 12 | 6.5 |
 
-On Germany, the autoregression on levels beats the benchmark by 18.5 percent and the benchmark ranks sixth. On the panel, the same model is fourth, 5.3 percent worse than the benchmark, and the benchmark is first. The rank correlation between the two evaluations is 0.41, with a p value of 0.16; the two rankings are not statistically distinguishable from unrelated orderings. The six-feature ridge falls from fourth to tenth and diverges in 5.6 percent of its paths.
+The published first-version winner was the ridge on lagged growth at 1.284, not the autoregression. The re-implementation gives the ridge 1.360 and moves the autoregression to first, so the exact tuning of the first version is not reproduced and the comparison that follows uses the winner of the re-estimated set. The ridge that won the published comparison is 24 percent worse than the benchmark on the panel in the re-estimation, so the sign of the result does not depend on which of the two is used. On Germany, the autoregression on levels beats the benchmark by 18.5 percent and the benchmark ranks sixth. On the panel, the same model is fourth, 5.3 percent worse than the benchmark, and the benchmark is first. The rank correlation between the two evaluations is 0.41, with a p value of 0.16; the two rankings are not statistically distinguishable from unrelated orderings. The six-feature ridge falls from fourth to tenth and diverges in 5.6 percent of its paths.
 
 The divergence pattern is informative. The models that feed forecasts back into their own lag structure, the six-feature ridge, the ARIMA(1,1,1), the Holt and the drift, produce explosive paths in small markets where the level is close to zero relative to its historical variation. The models that predict a transformation and invert it, or that average several forecasts, do not. The first version could not see this because it evaluated one large and stable market.
 
@@ -349,17 +349,49 @@ None of this is exotic, and together the mechanisms imply that a single-market c
 
 ### 6.4 What survives
 
-Two results survive the change of sample. The benchmark is hard to beat, and the damped Holt model is a close second on both samples. On Germany, damped Holt ranks tenth in the first-version set but second in the protocol set; on the panel, it is second in both. The stability of the damped Holt result is the one positive finding about a flexible model that the paper can defend.
+One result survives the change of sample: the benchmark is hard to beat. The damped Holt model is a close second in the protocol set, 2.9 percent worse on the panel and second at every horizon, but it ranks ninth in the first-version set on both samples. Its promotion is therefore a property of the protocol set, not a finding that is stable across specifications. The one positive statement about a flexible model that the paper can defend is narrower: damped Holt is the only challenger that comes within three percent of the benchmark in the protocol set, and it does so at every horizon.
 
-The negative findings are stronger. A linear trend, a log-linear trend, a random forest and a six-feature ridge are all worse than the benchmark on the panel, and several of them are significantly worse after Holm correction. The machine learning models do not fail because they are badly implemented; they fail because the signal in an annual national registration series is weak relative to the noise, and a flexible function fits the noise.
+The negative findings are stronger. A linear trend, a log-linear trend, a random forest and a six-feature ridge are all worse than the benchmark on the panel in point estimate. Only the random forest is significantly worse after Holm correction. The linear trend (p = 0.160) and the log-linear trend (p = 0.131) do not pass the corrected threshold, and the six-feature ridge is not part of the protocol set, so it has no Holm-adjusted p value to report. The distinction matters: the paper can say that the flexible models do not beat the benchmark, not that every one of them is significantly worse.
 
-## 7 Robustness
+## 7 Monte Carlo and robustness
 
-### 7.1 Five checks fixed before estimation
+### 7.1 Why a simulation
+
+The tests in Section 5 rest on a variance estimator, not on a known sampling distribution. With seventeen countries and fourteen origin years the asymptotic justification of the two-way cluster variance is plausible but not guaranteed, and the one-way alternative is used widely enough that its finite-sample behaviour matters. The simulation asks a narrow question. If the true expected loss of two models is equal, how often does each test reject at the five percent level when the loss differential contains a country effect, a year effect and an idiosyncratic cell effect? And if one model is better by a small margin, how often does the test detect it? The answer does not depend on the thirteen forecasting models; it depends only on the dependence structure that the panel exhibits.
+
+### 7.2 Design
+
+The differential is generated as d = mu + a + b + e, where a is a country effect, b an origin effect and e a cell effect, each normal with mean zero and independent of the others. The three standard deviations are estimated from the observed differentials of the twelve challengers against the naive benchmark by the method of moments for a crossed random effects model, and the median across the twelve models is used: 0.312 for the country component, 0.300 for the origin component and 0.829 for the cell component. The design has seventeen countries, fourteen origins and five horizons, which gives 1,190 cells per replication, and 4,000 replications per scenario. The seed is fixed and the script is in the repository.
+
+Five statistics are computed on the same simulated differentials. The first is the independent t test on all cells. The second clusters by country. The third clusters by country and by origin, with the usual subtraction of the cell variance. The fourth is a country block bootstrap with 400 draws. The fifth is the Harvey-Leybourne-Newbold correction at horizon five applied to the series of origin means. Size is measured with mu equal to zero; power with mu equal to minus 0.10, which is a tenth of a point of scaled error, about five percent of the benchmark. The alternative is not arbitrary: the gap between the benchmark and damped Holt is 0.056 and the gap between the benchmark and theta is 0.115, so 0.10 is the range that decides the top of the table.
+
+Table 6. Size and power of the five tests, 4,000 replications.
+
+| Test | Size at five percent | Power at mu = -0.10 |
+|:--|--:|--:|
+| Independent t | 0.638 | 0.745 |
+| One-way country cluster | 0.159 | 0.290 |
+| Two-way country and origin | 0.047 | 0.108 |
+| Country block bootstrap | 0.201 | 0.351 |
+| HLN at horizon five | 0.592 | 0.670 |
+
+### 7.3 Size
+
+The independent test rejects a true null in 63.8 percent of samples. The failure is not a small-sample curiosity: it is the expected consequence of treating 1,190 correlated cells as independent observations when the year effect alone carries a variance component of 0.09. One-way clustering removes most of the error but not all of it, because it leaves the common annual shock inside the residual; the rejection rate is 15.9 percent, three times the nominal level. The two-way estimator holds the size at 4.7 percent. The bootstrap is better than the independent test but still over-rejects at 20.1 percent, because resampling countries does not reproduce the year effect. The HLN correction, designed for overlapping forecasts from a single series, leaves the cross-sectional dependence untouched and rejects in 59.2 percent of samples.
+
+The ordering of the five procedures is the paper's justification for the two-way test and for reporting the one-way p values beside it. A reader who is used to clustering by country would still over-reject by a factor of three in this design.
+
+### 7.4 Power
+
+The two-way test detects a true improvement of 0.10 in only 10.8 percent of samples. The number is low, and it is informative. The panel has seventeen clusters in one dimension and fourteen in the other, and the year component is large; a difference of a tenth of a point is small relative to the sampling error of the country-balanced mean. The failure to reject equal accuracy in Table 4 is therefore not evidence that all thirteen models are equally good. It is evidence that the panel cannot resolve differences of the size that separates most of them. The model confidence set that contains all thirteen candidates should be read in the same way: it is a statement about the resolving power of the sample, not a statement that the linear trend is as good as the benchmark.
+
+The power result also explains why the paper reports point estimates and ranks alongside the tests. A ranking is a description of the sample; a significant difference is a statement about the population. With this design the first is informative and the second is rare, and a paper that reported only the second would say almost nothing.
+
+### 7.5 Five checks fixed before estimation
 
 The protocol lists five checks that change one ingredient each: the origins, the training window, the loss, the countries and the penalty. All five were run after the timestamp and are reported whether or not they support the ranking.
 
-Table 6. Robustness checks against the main ranking.
+Table 7. Robustness checks against the main ranking.
 
 | Check | What changes | Cells | Naive | Best challenger | Challenger | Naive rank |
 |:--|:--|--:|--:|--:|:--|--:|
@@ -368,29 +400,31 @@ Table 6. Robustness checks against the main ranking.
 | Rolling window | 20-year window replaces expanding | 8,090 | 1.892 | 1.907 | theta | 1 |
 | Symmetric loss | sMAPE replaces scaled absolute error | 13,610 | 0.297 | 0.327 | damped Holt | 1 |
 | Leave one country out | one country removed, 17 folds | 17 folds | - | - | - | 1 in 17 |
-| Fixed penalty | ridge alpha set to 0.1, 1, 10 | 13,610 | 1.896 | 2.028 | ridge, alpha 10 | 1 |
+| Fixed penalty | ridge alpha set to 0.1, 1, 10, no divergence filter | 13,610 | 1.913 | 2.028 | ridge, alpha 10 | 1 |
 
 The table is the robustness statement in one place: the benchmark is first in every check, and the runner-up changes only between damped Holt and theta.
 
-### 7.2 The crisis and the window
+### 7.6 The crisis and the window
 
 The crisis check removes the origins of 2008 and 2009, which are the two origins whose five-year windows contain the financial crisis and the collapse of the German scrappage programme. The benchmark improves from 1.913 to 1.766, which is expected: the crisis years are hard for every model, and removing them lowers the average error of all candidates. Damped Holt improves from 1.969 to 1.778 and comes within 0.7 percent of the benchmark. The gap between the two is now smaller than the standard error of either mean, and the paper does not claim that damped Holt is worse in a statistical sense. It claims only that it does not beat the benchmark, which is what the test in Table 4 says.
 
 The rolling window replaces the expanding window with the last twenty observations. This is the check that most favours flexible models, because a short window adapts to the level shift after 2009 and gives the damped Holt and theta methods a cleaner signal. Theta moves to second place at 1.907, 0.8 percent worse than the benchmark at 1.892, and damped Holt falls to third at 1.945. The benchmark remains first. The exercise also shows why the protocol fixed the expanding window in advance: with a rolling window the ranking of the challengers changes, and a paper that chose the window after seeing the results could have reported either ordering as the main finding.
 
-### 7.3 A loss that does not scale by the training window
+### 7.7 A loss that does not scale by the training window
 
 The scaled absolute error divides by the mean absolute first difference of the training window. That normaliser is right for comparing series of different volatility, but it is not the only defensible choice, and a critic could argue that the benchmark benefits because the normaliser is computed on the same differences that the naive forecast extrapolates. The symmetric absolute percentage error removes the normaliser and divides each error by the average of the actual and the forecast.
 
 Under this loss the benchmark is first at 0.297, damped Holt second at 0.327 and theta third at 0.330. The random forest, eleventh under the scaled loss, is eighth at 0.374, and the linear trend is twelfth at 0.420. The top three are unchanged, the rank correlation between the two orderings is 0.93, and the only material movement is the random forest, which gains because percentage errors penalise large errors in small markets less. The conclusion does not depend on the loss.
 
-### 7.4 No single country drives the result
+### 7.8 No single country drives the result
 
 The leave-one-country-out check removes each of the seventeen countries in turn and recomputes the full ranking. The benchmark is first in all seventeen folds. The result is stronger than a standard error: it says that there is no single market whose removal produces a challenger ranking, which is what a critic would look for if the benchmark's advantage came from one large or one unusual country. Germany, which carries the largest weight in a pooled average, is not necessary for the result; neither is the Netherlands, which carries the largest gain for a flexible model.
 
+The divergence rule removes a different number of cells from each model, so the means in Table 3 rest on slightly different samples: 1,080 cells for the models that never diverge, 1,070 for damped Holt, 1,045 for drift, 1,035 for the ridge on lags and 995 for ETS. To check that the ranking does not depend on this, every cell in which any model diverges was dropped and the country-balanced mean was recomputed on the remaining 11,960 errors. The order at the top is unchanged: naive 2.219, damped Holt 2.298, theta 2.319. The levels rise because the dropped cells are not a random subset: they are the cells in which a recursive path explodes, and those cells carry large scaled errors for the affected models. The benchmark keeps its lead on the sample that every model can forecast.
+
 The check also answers a question about the sample rule. The rule admits countries with at least twenty-five consecutive observations, and the excluded countries are mostly small markets with short histories. If the result depended on the composition of the seventeen, removing one country at a time would reveal it. It does not.
 
-### 7.5 The penalty of the ridge model
+### 7.9 The penalty of the ridge model
 
 The ridge model tunes its penalty at every origin over a grid from 0.01 to 100 with three expanding folds. That is defensible, but it makes performance depend on a search that is itself estimated. The check fixes the penalty at 0.1, 1 and 10 and refits at every origin without a search.
 
@@ -402,7 +436,7 @@ The fixed-penalty versions produce mean scaled errors of 2.122, 2.103 and 2.028.
 
 The interval is built by split conformal prediction on the origin dimension. The origins are ordered by year, the first sixty percent form the calibration set and the remaining forty percent the evaluation set. For each horizon the calibration set gives the empirical quantile of the absolute scaled error, and the interval is the point forecast plus and minus that quantile times the scale of the training window. The split respects the time order, so calibration errors come from earlier origins than evaluation errors. This is not the exchangeability that the conformal guarantee assumes, and the coverage below is an empirical property of this panel rather than a theorem.
 
-Table 7. Empirical coverage of the split conformal interval, by nominal level and horizon.
+Table 8. Empirical coverage of the split conformal interval, by nominal level and horizon.
 
 | Horizon | 80 percent | 90 percent | 95 percent | Calibration cells | Evaluation cells |
 |--:|--:|--:|--:|--:|--:|
@@ -414,11 +448,13 @@ Table 7. Empirical coverage of the split conformal interval, by nominal level an
 
 The interval over-covers at every level. At the ninety percent level the empirical coverage is 0.953 at both the first and the fifth horizon; at the eighty percent level it is between 0.884 and 0.919; at the ninety-five percent level it reaches one at horizons four and five. Over-coverage of this size is expected when the quantile is estimated from 130 cells and the evaluation set is small. It is also the conservative direction: a corridor that is too wide is a weaker claim than a corridor that is too narrow, and the paper prefers the weaker claim.
 
+The evaluation window is not free of the pandemic. The origins run from 2005 to 2019, and a five-year horizon from the 2015 origin reaches 2020, so the evaluation set contains 85 cells whose target year is 2020, including the collapse. The corridor is therefore tested on the shock, not only on calm years. A critic might add that the quantile is estimated on the panel and applied to Germany, the most stable market in the sample. To check the objection, the same split was repeated with German cells only: the ninety percent quantile at the five-year horizon falls from 5.975 to 2.758, and the German-only interval covers two of the six evaluation origins, 0.333, against 0.953 for the pooled quantile. The narrower quantile is not more honest; it is estimated on eight origins and does not survive the evaluation window. Pooling is what makes the German corridor valid, and the price is a wider band.
+
 ### 8.2 The projection
 
 The point forecast for 2040 is the last observed value, 2,857,591 passenger car registrations in 2025, carried forward. This is not a prediction that demand will be flat. It is the benchmark that no candidate beat, and the protocol requires the projection to be built on the selected model, which is the benchmark. The corridor around it is the conformal quantile at the five-year horizon, 5.975 in scaled units, multiplied by the scale of the German series and by the square root of the ratio of the projection horizon to the calibration horizon.
 
-Table 8. Projection of German passenger car registrations, selected years.
+Table 9. Projection of German passenger car registrations, selected years.
 
 | Year | Lower 90 percent | Point | Upper 90 percent | Width |
 |--:|--:|--:|--:|--:|
@@ -433,23 +469,23 @@ Table 8. Projection of German passenger car registrations, selected years.
 
 The corridor is wide, and its width is the result. At 2040 the ninety percent interval runs from 0.61 to 5.10 million registrations, a factor of eight between the bounds. A planning department that needs a single number for capacity will not find it here, and the paper argues that it should not look for one in any annual model with seventeen countries and thirty-four years. What the corridor provides is a disciplined statement of how much is unknown: the width comes from the errors the benchmark actually made at one to five years, extrapolated by a stated rule, and it can be compared across specifications.
 
-The comparison with the first version is the sharpest illustration. The first version reported a ninety percent band from 2.56 to 3.69 million for 2040, a width of 1.13 million. The new band is 4.49 million wide, four times wider, and the difference is not a change of data or of model but a change of calibration. The first version scaled one to five year errors linearly to fifteen years; the new version uses a quantile estimated on the panel and a square root scaling. The wider band is the more honest one, and the fact that the earlier band looked more decisive is the danger the protocol is designed to expose.
+The comparison with the first version is the sharpest illustration. The first version reported a ninety-five percent band from 2.56 to 3.69 million for 2040, a width of 1.13 million. The new band is 4.49 million wide at ninety percent, four times wider, and the difference is not a change of data or of model but a change of calibration. The comparison is conservative, because a ninety-five percent band under the new calibration would be wider still. The first version scaled one to five year errors linearly to fifteen years; the new version uses a quantile estimated on the panel and a square root scaling. The wider band is the more honest one, and the fact that the earlier band looked more decisive is the danger the protocol is designed to expose.
 
-The square root scaling is the one that a random walk implies for the standard deviation of the cumulative error, and it is the natural default when the model is the benchmark. It is not estimated from the data, and a different scaling would produce a different width: a linear rule would give a wider corridor and a bounded trend a narrower one. The protocol fixes the rule in advance and reports it as an assumption, so the paper's claim is conditional on it and the condition is visible.
+The square root scaling is the one that a random walk implies for the standard deviation of the cumulative error, and it is the natural default when the model is the benchmark. It is not estimated from the data, and a different scaling would produce a different width: a linear rule would give a wider corridor and a bounded trend a narrower one. The panel also provides evidence for the rule. The benchmark's own scaled error rises from 1.106 at one year to 2.441 at five years, a ratio of 2.21 against the 2.24 that a square root implies (Table A1). The rule is therefore not only the random walk default; it is the shape that the benchmark's errors display across the evaluated horizons. The protocol fixes it in advance and reports it as an assumption, so the paper's claim is conditional on it and the condition is visible.
 
 ## 9 The machine-checked split
 
 ### 9.1 What is formalised
 
-The Lean module formalises the two objects that the protocol depends on and that a reader cannot check by reading the Python. The first is the information split: at origin m the forecaster may use observations with indices below m and nothing else. The second is the selection: given a finite list of candidate keys, the protocol selects the smallest key in a lexicographic order that ranks origins before models.
+The Lean module formalises the two objects that the protocol depends on and that a reader cannot check by reading the Python. The first is the information split: at origin m the forecaster may use observations with indices below m and nothing else. The second is the deterministic part of selection: given a finite list of candidate keys, the tie-breaking rule selects the smallest key in a lexicographic order that ranks origins before models. The module proves the order and the fold, not the statistical tests that produce the scores, and the Python implementation is a specification of the same rule rather than code extracted from Lean.
 
 The module works with lists of rational numbers rather than real numbers. The choice keeps the development inside Lean core, avoids a dependency on a measure theory library, and makes every computation exact. The forecast is the mean of the prefix of length m; the scale is the mean absolute first difference of the same prefix; the order on keys of type Nat times Nat is defined explicitly, because Lean core has no instance for pairs. The selection is a fold over the candidate list that keeps the smaller key and breaks ties towards the earlier candidate.
 
 ### 9.2 The theorems
 
-Table 9 groups the eighteen theorems by what they establish.
+Table 10 groups the eighteen theorems by what they establish.
 
-Table 9. The verified properties and what they guarantee.
+Table 10. The verified properties and what they guarantee.
 
 | Group | Theorems | Statement in words |
 |:--|:--|:--|
@@ -461,7 +497,7 @@ Table 9. The verified properties and what they guarantee.
 | Selection | argmin_mem, argmin_le, argmin_unique | The selected key is a candidate, is minimal, and is unique when keys are distinct |
 | Selection steps | argminStep_eq_new_or_acc, argminStep_spec, argmin_cons_ne_none, argmin_eq_none | The fold returns the new or the incumbent key, is below both, never returns none on a nonempty list, and returns none only on the empty list |
 
-The causality theorems are the formal content of the non-anticipative condition in Section 3.1, and the generic version states the property for an arbitrary function of the prefix, so the result does not depend on the mean being the forecast. The append theorems are the same statement in the form that a programmer uses: the forecast at origin m is invariant to data that arrive after m. The selection theorems are the formal content of the selection functional in Section 3.3: the model that the protocol reports is a member of the candidate set, no candidate is strictly better in the order, and with distinct keys it is the only such candidate.
+The causality theorems are the formal content of the non-anticipative condition in Section 3.1, and the generic version states the property for an arbitrary function of the prefix, so the result does not depend on the mean being the forecast. The append theorems are the same statement in the form that a programmer uses: the forecast at origin m is invariant to data that arrive after m. The selection theorems formalise the tie-breaking rule inside selection, not the statistical selection of Section 3.3. They say that the key order is total and that the fold returns a minimum of the candidate list: the result is a member of the set, no candidate is strictly better in the order, and with distinct keys it is the only such candidate. Which candidate receives the smallest score is decided by the Python code, and the proof does not connect the two mechanically.
 
 The module builds with Lean 4.36.0 and the toolchain pinned in the repository. The build exits with code zero, contains no sorry, and the axiom check reports only propext, Classical.choice and Quot.sound, which are the three axioms that Lean's standard library uses. The build log is committed with the source.
 
@@ -481,7 +517,7 @@ The contribution is not the discovery that the naive forecast is good. It is the
 
 ### 10.2 For the literature and for practice
 
-Single-market forecasting studies are common in the automotive literature, and the most direct implication is that their model rankings should be read as conditional on the market. A study that reports a gradient boosting model beating the naive forecast by twenty percent on one market may be correct about that market and wrong about the technology. The panel design that would settle the question is cheap: Eurostat publishes the registrations series for forty-one countries, the sample rule is a paragraph of code, and the two-way test requires no more than a cluster-robust variance. A second implication concerns the loss: a model that diverges in five percent of its paths, as the six-feature ridge does, is not a model a planning department can use even if its average error is competitive, and the divergence rule turns that judgement into a number.
+A comparison run on a single market can rank models only for that market, and the most direct implication is that its ranking should be read as conditional on the market. A study that reports a gradient boosting model beating the naive forecast by twenty percent on one market may be correct about that market and wrong about the technology. The panel design that would settle the question is cheap: Eurostat publishes the registrations series for forty-one countries, the sample rule is a paragraph of code, and the two-way test requires no more than a cluster-robust variance. A second implication concerns the loss: a model that diverges in five percent of its paths, as the six-feature ridge does, is not a model a planning department can use even if its average error is competitive, and the divergence rule turns that judgement into a number.
 
 The corridor is the practical object. A firm that plans capacity on a point forecast of 2.86 million registrations for 2040 is planning on a number the paper can defend only as a benchmark, with a ninety percent range from 0.61 to 5.10 million. The defensible posture is to treat the corridor as the input and to test strategies against its bounds: a capacity investment that survives 0.61 million and one that survives 5.10 million are different investments, and the difference is the value of the information the corridor says is missing. The paper does not recommend a strategy for Volkswagen or for the German industry; that is the subject of the companion papers. What it provides is the measurement layer, and a strategy built on a different layer can be compared with this one.
 
@@ -501,7 +537,7 @@ Finally, the paper is written by one author and evaluated on one panel. The stro
 
 The paper asked whether a flexible model can beat the naive forecast of annual car registrations when the comparison is specified in advance, tested on a panel and corrected for multiplicity. The answer is no. Across thirteen candidates, seventeen countries, 216 origins and 13,610 usable errors, the benchmark is first at every horizon, the two closest challengers are not statistically distinguishable from it, and the candidates that are significantly worse after Holm are those that extrapolate a trend. The result survives the exclusion of the crisis years, a rolling window, a different loss, the removal of each country in turn and a fixed penalty for the ridge model.
 
-The paper makes four contributions. It provides a pre-registered panel protocol for forecast evaluation in a technology-intensive industry, with a frozen specification, a public timestamp and a reproducible pipeline. It shows that two-way clustering by country and year is the appropriate inference in this design, and that the one-way procedure that the first version used over-rejects by a factor of six in a Monte Carlo design calibrated to the panel. It reports a corridor to 2040 that is four times wider than the one a single-market calibration produced, and it argues that the width is the finding. It verifies the information split and the selection functional in Lean 4, so that the two discrete components of the protocol are machine-checked rather than asserted.
+The paper makes four contributions. It provides a pre-registered panel protocol for forecast evaluation in a technology-intensive industry, with a frozen specification, a public timestamp and a reproducible pipeline. It shows that two-way clustering by country and year is the appropriate inference in this design, and that one-way country clustering over-rejects a true null by a factor of three in a Monte Carlo design calibrated to the panel. It reports a corridor to 2040 that is four times wider than the one a single-market calibration produced, and it argues that the width is the finding. It verifies the information split and the deterministic tie-breaking rule in Lean 4, so that the two discrete components of the protocol are machine-checked rather than asserted.
 
 The agenda that follows is empirical. The same protocol can be applied to monthly registrations, to other countries, to the Chinese market with a longer series and to the powertrain mix, where the question is not the level of demand but its composition. Each application would produce its own ranking, and the comparison across applications would be the evidence that a single study cannot provide. The benchmark is hard to beat, and the useful question is no longer whether a flexible model can beat it in one market, but where and under which conditions it can beat it across many.
 
