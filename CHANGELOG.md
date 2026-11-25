@@ -1,4 +1,7 @@
 # Changelog
+## v1.3.9, 25 November 2026
+- Corrected two event level statements in P05 so that they match the standardised statistics. The Italdesign three day reaction is now described as not significant at five percent, with a Patell statistic of 1.78, rather than as indistinguishable from zero. The Everllence reaction is now described as rejecting the null on its own, with a Patell statistic of minus 4.09, and the text states that a single event cannot separate the programme from other news in the window.
+- Updated the data availability tag to v1.3.9 and rebuilt the P05 PDF and DOCX, 30 pages and 42 references.
 ## v1.3.8, 25 November 2026
 - Corrected the P05 sector benchmark. The paper used EXV4.DE, which is the iShares STOXX Europe 600 Health Care UCITS ETF (DE), in place of EXV5.DE, the iShares STOXX Europe 600 Automobiles and Parts UCITS ETF (DE). The fund metadata is now stored with the price file and the analysis refuses a benchmark whose name does not contain Automobiles.
 - Recomputed every P05 result. The sector beta is 0.965350, alpha 0.000498, residual standard deviation 0.010959 and R squared 0.631.
