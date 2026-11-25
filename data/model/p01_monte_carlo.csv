@@ -1,0 +1,3 @@
+scenario,mu,reps,size_iid,size_cluster,size_twoway,size_boot,size_hln5,mean_differential
+null,0.0,4000,0.6815,0.304,0.04825,0.35275,0.543,0.003348537399425809
+alternative,-0.1,4000,0.71325,0.377,0.076,0.42225,0.5725,-0.09434681947299267

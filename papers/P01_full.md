@@ -1,430 +1,541 @@
-# Fixing the model before the backtest: a pre-registered protocol with a machine-checked split for long-horizon automotive demand
+# The benchmark is hard to beat: a time-stamped panel protocol with a machine-checked split for long-horizon car demand
 
 Armin Kajevic
 
-Ingolstadt, Germany
+ORCID 0009-0004-1241-8313
+
+Correspondence: armin.kajevic@proton.me
+
+Version 2.0, 25 November 2026
+
+Concept DOI 10.5281/zenodo.24516636
 
 ## Abstract
 
-Forecast comparisons in applied economics are often assembled after the results are known. The candidate set grows when a model fails, the loss changes when a ranking is inconvenient, and the boundary between training and test data is defended by code review rather than by proof. This paper sets out a protocol in which the candidate set, the rolling-origin design, the loss, the selection rule and the projection are fixed before any result is seen, and in which the deterministic part of the split is checked by the Lean 4 kernel. Thirteen models are evaluated on annual German passenger car registrations from 1991 to 2025 at fifteen origins and horizons of one to five years. Ridge regression on lagged growth wins with a mean absolute scaled error of 1.2839 against 1.5952 for the naive benchmark, a reduction of 19.5 percent. The pre-specified horizon test rejects equal accuracy at four and five years, with p values of 0.011 and 0.009, while a bootstrap of the same statistic, a variance clustered by origin and a Bonferroni bound over thirteen candidates do not, and the paper reports that disagreement instead of resolving it in its own favour. The 2040 point forecast is 3,161,958.51 registrations, with an empirical 95 percent interval from 2,563,157.85 to 3,689,022.75. On a second series, Volkswagen Group deliveries in China from 1987 to 2025, no model beats the random walk, and the protocol reports that null unchanged. The contribution is a protocol that can be audited, a published negative result, and a method for turning statistical uncertainty into a number a board can act on.
+Forecast comparisons in the automotive literature are usually run on one market and a short evaluation window. This paper asks whether the winner of such a comparison survives when the same protocol is applied to many markets. The protocol fixes the sample, thirteen candidate models, the tuning rules, the scaled loss, the rolling origins, the tests and the interval construction before the panel is evaluated, and the protocol file carries an external cryptographic timestamp. The panel covers seventeen European markets from 1991 to 2024, 539 annual observations, 216 forecast origins and 13,610 usable forecast errors. The naive benchmark wins at every horizon, with a mean absolute scaled error of 1.913 against 1.969 for damped Holt and 2.028 for the theta method, and no candidate beats it after Holm correction. The earlier single-market version, run on Germany alone, had reported an 18.5 percent gain for a flexible model over the same benchmark. That gain disappears on the panel, where the German winner is 5.3 percent worse than the benchmark and the rank correlation between the two evaluations is 0.41. A Monte Carlo study shows why the usual test overstates precision: with a common annual shock, an independent t test rejects a true null in 68 percent of samples and one-way country clustering still rejects in 30 percent, while two-way clustering by country and year holds the size at 4.8 percent. Split conformal intervals calibrated on the first sixty percent of origins cover at least their nominal level at every horizon. The German projection for 2040 is 2.86 million registrations with a 90 percent band from 0.61 to 5.10 million, four times wider than the band in the single-market version. A Lean 4 module proves that the forecast and the scale at an origin depend only on data up to that origin, and that the selection rule returns a unique minimiser. The lesson is uncomfortable and useful: in this class of annual demand series the benchmark is hard to beat, single-market wins are fragile, and a corridor honest enough for planning is much wider than the published one.
 
-Keywords: forecast evaluation, rolling origin, pre-registration, MASE, Diebold and Mariano, Lean 4, automotive demand
+Keywords: forecast evaluation, rolling origin, pre-registration, conformal prediction, panel data, automotive demand
 
-JEL codes: C52, C53, C18, L62
+JEL: C12, C32, C52, C53, L62
 
 ## 1 Introduction
 
-A forecast is a claim about a future that cannot be observed. A forecast comparison is a claim about which of several such claims is better, and it is made on a sample that is small, overlapping and chosen by the analyst. The second claim is the fragile one. It is fragile because the analyst who compares models has usually seen the results before deciding which comparison to report, because the candidate set is usually enlarged after a failure, and because the boundary between the data used to fit and the data used to judge is usually enforced by a line of code that no reader can check.
+A forecast comparison looks like a measurement. A set of models is fitted to the same history, each is asked for the same future values, and the model with the smallest average error is declared the winner. The appearance of measurement hides a large number of choices: which models enter, how their parameters are tuned, which loss is reported, which origins are evaluated, and which of the many possible comparisons are shown. When those choices are made after the results are known, the winner is partly a property of the analyst. The forecasting literature has documented the problem for decades, and the reproducibility literature has shown how persistent it is in applied fields.
 
-This paper takes the fragility seriously and removes the freedom that produces it. The candidate set, the rolling-origin scheme, the loss, the scale, the selection rule and the projection are fixed in a protocol before the first result is computed. The protocol is written down, dated and stored with the code. The deterministic part of the split, which is the part that decides whether an observation belongs to training or to evaluation, is written in Lean 4 and checked by the kernel, so that the claim that no future observation enters a forecast is a theorem rather than a promise. The statistical part, which is the estimation and the projection, remains in Python and is not formalised.
+This paper does two things. It writes the choices down before the evaluation, and it asks whether the resulting winner travels. The first part is a protocol: a fixed sample, a fixed set of thirteen models, fixed tuning rules that use only the training window, a fixed loss, fixed origins, fixed tests and a fixed interval construction. The protocol file is frozen and sent to an independent time-stamp authority, which returns a signed token that binds the file to a calendar date. The token can be verified with a single command by anyone who has the file. This is a weaker instrument than a registered report, because no journal has reviewed the plan, and it is a stronger instrument than a file in a repository, because the date does not depend on the author.
 
-The empirical setting is the German passenger car market. Annual registrations from 1991 to 2025 give 35 observations, a series that moves between 2,567,103 and 3,807,175 vehicles, that contains the reunification boom, the 2009 scrappage programme and the 2020 collapse, and that is the single number a manufacturer, a supplier and a ministry all watch. Thirteen candidates are compared: two benchmarks, six econometric models, four machine learning models and one equal-weight combination. The comparison runs at fifteen rolling origins, from 2006 to 2020, at horizons of one to five years, which gives 75 forecast errors per model.
+The second part is the empirical question. The first version of this study evaluated thirteen models on German registrations from 1991 to 2025 and found that a flexible model beat the naive benchmark by about 19 percent. That result was internally consistent, statistically tested and reproducible from the repository. It was also, as the panel shows, a property of one market. When the same exercise is repeated on seventeen European markets, the benchmark wins at every horizon, the German winner falls to fourth place, and the correlation between the two rankings is weak. The gain does not survive the change of sample.
 
-Three results organise the paper. First, the winner is ridge regression on three lagged growth rates, with a mean absolute scaled error of 1.2839 against 1.5952 for the naive benchmark, a reduction of 19.5 percent. Second, the gain is not uniform across horizons: the corrected Diebold and Mariano test separates the long horizons, where the corrected statistic is minus 2.911 at four years and minus 3.009 at five, from the short horizons, where it is indistinguishable from zero. Third, the same protocol applied to a second series produces a null: on Volkswagen Group deliveries in China, no candidate beats the random walk, the best scaled error is 7.7778, and the p value against naive is 0.9615. The null is reported as a result, not as a failure, because a protocol that can only produce wins is not a protocol.
+That finding is the contribution. It is not a claim that flexible models are useless. It is a demonstration that a single-market rolling-origin comparison, even when it is carefully executed, has enough sampling variation to produce a large and statistically significant improvement that does not generalize. The panel makes the variation visible, and the Monte Carlo study shows that the conventional test makes it worse by understating the standard error when errors share a common annual shock.
 
-The paper makes four contributions. It specifies a forecast comparison that is fixed in advance and therefore immune to the garden of forking paths described by Gelman and Loken (2014) and to the selection effects reviewed by Simmons, Nelson and Simonsohn (2011). It proves the split property in a proof assistant, which turns a code review question into a formal one, following the reproducibility agenda of Peng (2011) and Munafò et al. (2017). It reports a negative result on a second series with the same protocol, which is rare in a literature that publishes wins. And it converts the backtest errors into an empirical interval, so that the output of the exercise is a corridor rather than a point, which is the form in which a planning department can use it.
+The paper also repairs the interval. The single-market version reported a 2040 interval from 2.56 to 3.69 million registrations, calibrated on errors at horizons of one to five years and applied to a horizon of fifteen. The panel allows a split conformal calibration by horizon, a check of empirical coverage on held-out origins, and an explicit scaling rule beyond the evaluated horizon. The resulting band is much wider, and the paper argues that the wider band is the correct one. A planning department that uses a corridor of plus or minus four hundred thousand vehicles at a fifteen-year horizon is using a corridor that the data do not support.
 
-The rest of the paper is organised as follows. Section 2 reviews the literature on forecast evaluation, testing, multiplicity and reproducibility, and states the gap. Section 3 states the hypotheses and the pre-specified decision rules. Section 4 describes the two series and the transformations. Section 5 sets out the protocol, the formal definitions and the Lean module. Section 6 reports the results. Section 7 reports the robustness checks. Section 8 discusses what the design cannot establish. Section 9 concludes. The data, the code and the Lean module are listed in the availability statements at the end.
+The formal part is strengthened as well. The first version proved that the indices used by the training window lie below the origin, a statement that is true and nearly trivial. The new module proves a property of the functions: the forecast and the scale at an origin are invariant to any change in the data after that origin, and the lexicographic selection rule is a total order with a unique minimiser. The Lean 4 kernel checks the proofs, the module contains no unfinished proof, and the axioms it relies on are the three standard ones.
+
+The paper proceeds as follows. Section 2 reviews the literature on forecast evaluation, multiplicity, reproducibility and formal verification. Section 3 states the protocol, including the models, the loss, the tests and the interval rule, and describes the time stamp and the two deviations that occurred during execution. Section 4 describes the panel and its breaks. Section 5 reports the panel results. Section 6 compares the single-market and panel evaluations and explains why the ranking does not travel. Section 7 reports the Monte Carlo study and the robustness checks. Section 8 builds the 2040 corridor. Section 9 describes the Lean module. Section 10 discusses implications and limitations, and Section 11 concludes.
 
 ## 2 Literature review
 
 ### 2.1 Evaluation on a rolling origin
 
-The evaluation of forecasting models has a long record of out-of-sample failures, of which the Meese and Rogoff (1983) result on exchange rate models is the classic case, and the practice is surveyed by Armstrong (2001) and Hyndman and Athanasopoulos (2021). The standard alternative to a single train-test split is the rolling-origin design, in which the model is estimated on data up to an origin, forecasts are made for horizons one to h, the origin moves forward, and the errors are collected. Tashman (2000) sets out the design and its pitfalls, including the choice of window, the treatment of the first origins and the temptation to report only the last split. Bergmeir and Benítez (2012) show that cross-validation is not automatically valid for time series, because the dependence structure that makes a series predictable also makes a random fold leak information. Bergmeir, Hyndman and Koo (2018) give conditions under which cross-validation remains valid for autoregressive models, and Cerqueira, Torgo and Mozetič (2020) compare performance estimation methods across a large set of series and find that the choice of method changes the ranking. The protocol in this paper follows Tashman in fixing the origins and the horizons, and it follows the later literature in reporting every origin rather than a selected one.
+The practice of evaluating a forecast on a sequence of origins goes back to the forecast competitions and to the early work on out-of-sample comparison. Tashman (2000) gave the canonical statement of the rolling-origin design and warned that a single holdout split wastes information and produces tests with low power. The M competitions turned the design into a shared benchmark: Makridakis and Hibon (2000) reported the third competition and Makridakis, Spiliotis and Assimakopoulos (2020) the fourth, where combinations and simple benchmarks again performed well against elaborate methods. The recurring result is that the naive forecast is a serious competitor on annual and short-horizon data, and that the marginal value of complexity is small.
 
-The number of origins is a design choice with a statistical cost. Fifteen origins give fifteen errors per horizon, which is enough to rank models but not enough to estimate a tail. The paper therefore reports the ranking, the per horizon tests and the interval, and it treats the interval as the object with the widest uncertainty, which is the opposite of the usual practice of reporting the point and mentioning the interval.
+The econometric literature added inference. Diebold and Mariano (1995) proposed a test of equal expected loss based on the loss differential, Harvey, Leybourne and Newbold (1997) corrected its small-sample behaviour for multi-step forecasts, and Clark and West (2007) handled the nested-model case in which the larger model is true under the null. Giacomini and White (2006) shifted the object from the model to the forecasting method and proposed a conditional test that can detect state dependence in relative performance. These tests share an assumption that matters here: the loss differentials are stationary and weakly dependent, so a heteroskedasticity and autocorrelation consistent variance is adequate. That assumption is doubtful when the evaluation covers many units observed in the same years, because a common shock enters every country in the same period. The econometric literature on multiway clustering, summarised by Cameron, Gelbach and Miller (2011), shows that one-way clustering understates the variance in exactly this configuration, and Section 7 quantifies the consequence.
 
-### 2.2 Loss, scale and the choice of the object
+### 2.2 Loss, scale and the object
 
-A comparison needs a loss, and the loss determines what the comparison means. The absolute loss is consistent for the conditional median and the squared loss for the conditional mean, as set out in the probabilistic forecasting literature surveyed by Gneiting and Katzfuss (2014). A series that is bounded below and skewed in crisis years does not have a symmetric predictive distribution, so the two losses rank models differently. The protocol fixes the absolute loss for selection and reserves the squared loss for a reported root mean squared error and for the first tie-break.
+The choice of loss is not neutral. Hyndman and Koehler (2006) reviewed the measures used in practice and recommended the mean absolute scaled error because it is scale free, defined at zero and comparable across series. The scale is usually the mean absolute error of the naive forecast in the training window, which makes the loss a ratio of two average errors. The ratio is bounded below by zero and has no upper bound, so a single divergent forecast can dominate an average; this is why the protocol defines a divergence rule and reports the affected cells rather than letting them enter the mean.
 
-The scale is the second choice. The mean absolute scaled error of Hyndman and Koehler (2006) divides each absolute error by the in-sample mean absolute error of the naive forecast computed at the same origin. The scale is recomputed at every origin, which means that the benchmark does not score exactly one, a property that is often treated as a defect and is in fact the point: the metric compares each model to the naive forecast on the same information set, not to an abstract unit. The paper states this property and uses it, rather than assuming that the naive score is one.
+Probabilistic evaluation is a separate object. Gneiting and Katzfuss (2014) set out the properties that a scoring rule should have, and the interval literature has moved from residual quantiles to calibration and coverage. The split conformal approach of Vovk, Gammerman and Shafer (2005) gives a distribution-free finite-sample guarantee under exchangeability, which annual time series do not satisfy exactly. The paper therefore uses conformal quantiles as a calibration device and checks their empirical coverage on held-out origins rather than claiming a guarantee.
 
 ### 2.3 Testing equal accuracy
 
-Forecasting is also a task in which expertise is unevenly distributed, and Tetlock (2005) shows that confident judgment is a weak guide to distant outcomes, which is a reason to prefer a rule to a view. The comparison of two forecast sequences is a test of equal expected loss. Diebold and Mariano (1995) give the statistic and the variance estimator, and Harvey, Leybourne and Newbold (1997) correct the small-sample behaviour and the overlap. Clark and West (2007) address the nested case, in which the larger model contains the smaller one and the null lies on the boundary of the parameter space. Giacomini and White (2006) reframe the test as a conditional one, which is the right object when the question is whether a model is better in the regime that is being forecast rather than on average.
-
-The protocol uses the Diebold and Mariano statistic with the Harvey, Leybourne and Newbold correction at each horizon, because forecasts h steps ahead overlap by h minus one target years and the overlap inflates the effective sample. The pooled statistic that stacks all horizons is reported for reconciliation with the metrics file and is explicitly marked as not valid as a test. This distinction is the difference between a number that is arithmetically correct and a number that answers a question.
+Three practical issues arise in a panel of this kind. The first is the dependence structure, discussed above. The second is multiplicity: thirteen models against one benchmark produce twelve comparisons, and the probability of at least one false positive grows quickly. The Holm procedure controls the familywise error rate without assuming independence and is the appropriate default when the family is small and fixed in advance. The third is the distinction between testing a specific null and selecting a set of good models. Hansen, Lunde and Nason (2011) proposed the model confidence set, which inverts a sequence of tests to produce a set that contains the best model with a stated probability. The set is informative when the sample can separate the candidates and uninformative when it cannot. Section 5 reports both objects and interprets the difference.
 
 ### 2.4 Multiplicity, forking paths and pre-registration
 
-A selection rule that examines thirteen candidates and reports the best one is a search. The p value of the winner is the p value of one comparison computed after thirteen were examined, and the probability that the best of thirteen noise models looks good is not the nominal level. Simmons, Nelson and Simonsohn (2011) show how ordinary degrees of freedom in analysis produce false positives, and Gelman and Loken (2014) generalise the point to the garden of forking paths, in which no single decision is dishonest and the path is still selected after the data are seen. Nosek et al. (2018) argue that pre-registration is the remedy, and Christensen and Miguel (2018) set out what transparency means for economics in particular.
+The credibility revolution in economics and psychology produced a large literature on specification search. Simmons, Nelson and Simonsohn (2011) showed how flexible analysis choices inflate false positives, Gelman and Loken (2014) generalised the point to the garden of forking paths, and Christensen and Miguel (2018) reviewed the evidence in economics and the remedies that journals adopted. Nosek, Ebersole, DeHaven and Mellor (2018) argued that preregistration shifts the inferential weight from the result to the plan, Munafò and colleagues (2017) made the same case for reproducibility across disciplines, and Peng (2011) stated the computational version of the norm.
 
-The protocol is a pre-registration of a forecast comparison. It fixes the candidate set, the origins, the horizons, the loss, the scale, the tie-breaks, the selection functional and the projection, and it records a timestamp. It differs from a clinical trial registration in that the data are public and the exercise can be repeated by anyone, which is why the code and the Lean module are part of the contribution rather than an appendix.
+Forecasting has adopted these ideas unevenly. The M competitions publish their protocols and some journals encourage registered reports, but a forecast comparison with a frozen protocol and an external timestamp is still unusual. This paper does not claim that a timestamp is equivalent to peer review of the plan. It claims something narrower and verifiable: the file that contains the sample, the models, the tuning rules, the loss, the tests and the interval rule existed in that exact form at a date recorded by a third party, before the panel was evaluated.
 
 ### 2.5 Reproducibility and formal verification
 
-Reproducibility is usually treated as a property of code and data. Peng (2011) sets out the standard, Baker (2016) documents how far practice is from it, and Munafò et al. (2017) propose a manifesto that includes registration and reporting. Formal verification goes further: it proves a property of the algorithm rather than testing an implementation. De Moura and Ullrich (2021) describe Lean 4, and the mathlib community (2020) describes the library that makes formal mathematics practical. The module used here is deliberately small, nine theorems and no Mathlib, because the property that matters is local: the training set at an origin contains no index at or after the origin, and the expanding window is nested.
+Reproducibility is a property of a pipeline, and formal verification is a property of a statement. The two are complementary: a reproducible pipeline can contain a logical error, and a verified theorem can be irrelevant to the code that produced the numbers. The Lean 4 system, described by de Moura and Ullrich (2021) and supported by the mathematical library of the mathlib Community (2020), allows a small core of definitions to be checked down to the axioms. The first version of this paper used Lean to prove that the indices of the training window lie below the origin, which was true and added little because the code already sliced the array. The present version proves a property of the functions: the forecast and the scale at an origin are invariant to changes in the data after the origin.
 
-The choice of Lean rather than a test suite is a statement about what kind of error is being ruled out. A test can show that a function returned the right list on the cases that were tried. A proof shows that no input produces a leak. The cost is that only the deterministic skeleton is proved, and the paper says so.
+### 2.6 Machine learning and the benchmark
 
-### 2.6 Combinations, machine learning and the benchmark
-
-The forecasting literature has a long record of simple benchmarks beating complex models. Makridakis et al. (2000) report the M3 competition and Makridakis, Spiliotis and Assimakopoulos (2020) report M4, where combinations and relatively simple statistical methods remain hard to beat. Timmermann (2006) explains why combination works, and the equal-weight combination is included here as a candidate rather than as a default. The machine learning candidates are ridge regression (Hoerl and Kennard 1970), random forests (Breiman 2001) and gradient boosting (Friedman 2001), with a damped trend as the econometric alternative to a pure random walk (Gardner and McKenzie 1985). The point of including them is not to claim that machine learning wins. It is to put them in the same pre-registered comparison, so that a win or a loss is a result rather than a preference.
+The machine learning literature on time series has produced many flexible predictors and fewer careful evaluations. Breiman (2001) introduced the random forest, Friedman (2001) the gradient boosting machine, and Hoerl and Kennard (1970) the ridge estimator used here as a regularised autoregression. Bergmeir and Benítez (2012) and Bergmeir, Hyndman and Koo (2018) examined when cross-validation is valid for time series and concluded that it is defensible when the folds respect the temporal order and the errors are not strongly dependent; the protocol uses time series cross-validation inside each training window for that reason. The empirical record is sober. Cerqueira, Torgo and Mozetič (2020) compared performance estimation methods across many series and found that the choice of evaluation design can change the ranking more than the choice of model. That result motivates the present design, in which the design is the object of study and the models are the variation it is asked to handle.
 
 ### 2.7 Automotive demand and the case for a corridor
 
-The automotive literature supplies the object rather than the method. Sturgeon, Van Biesebroeck and Gereffi (2008) describe the industry as a global value chain in which assembly is the visible end of a long sequence of suppliers, and Klier and Rubenstein (2008) document how much of a vehicle is made by firms whose names are not on it. Demand forecasting at the manufacturer level is therefore a forecast of a chain, not of a brand. The official series used here are the German registrations from Destatis (2026), the German electric drive series from KBA (2025), the European registration data from ACEA (2025), and the Chinese deliveries reported by Volkswagen (2025) and by the China Association of Automobile Manufacturers (2025). The International Energy Agency (2025) provides the technology context. None of these sources provides a forecast, which is why the protocol is needed.
+The automotive literature on demand has focused on the determinants of registrations and on the transition to electric vehicles. Klier and Rubenstein (2008) described the structure of the North American supply chain, Sturgeon, Van Biesebroeck and Gereffi (2008) analysed the global value chain and its regional clusters, and the International Energy Agency (2025) documents the pace of electrification. Industry sources publish annual registrations: the European Automobile Manufacturers Association (2025) for Europe, the Kraftfahrt-Bundesamt (2025) and Destatis (2026) for Germany, and the China Association of Automobile Manufacturers (2025) for China.
+
+Planning departments use these series to size capacity, employment and investment, and a point forecast is of limited use for decisions with long lead times and asymmetric costs. What they need is a corridor: a range that contains the future with a stated probability, narrow enough to be informative and wide enough to be credible. The panel shows that the data support a corridor about four times wider than the one the single-market version reported, and the difference changes the decision that the corridor can support.
 
 ### 2.8 The gap
 
-The literature contains the pieces: rolling-origin evaluation, scaled losses, corrected tests, multiplicity corrections, pre-registration and formal methods. It does not contain a forecast comparison that fixes all of them in advance, proves the split, reports a negative result on a second series and converts the errors into an interval in the same paper. That combination is the contribution, and it is a contribution of method rather than of a number. The number is the test of the method.
+Three gaps follow. Forecast comparisons in this literature are usually single-market and do not report whether the ranking survives a change of sample. The standard errors rarely account for the common shock that affects all units in the same year. The intervals reported for long horizons are calibrated on short horizons and are not checked for coverage. This paper addresses all three: it runs a frozen protocol on seventeen markets, compares the panel ranking with the single-market ranking, and calibrates intervals by horizon with a coverage check and an explicit extrapolation rule.
 
-## 3 Hypotheses and pre-specified decision rules
+## 3 Protocol
 
-The protocol is stated as three hypotheses and three decision rules, all fixed before the backtest.
+### 3.1 Objects and the non-anticipative condition
 
-H1. A model selected by the protocol has a lower expected absolute scaled loss than the naive benchmark on the German series, at the pooled level and at the longest horizon.
+Let $y_{c,t}$ be the number of new passenger car registrations in country $c$ in year $t$. A forecast origin is a pair $(c,m)$, where $m$ is the last year whose value is used. The training window is
 
-H2. The gain is horizon-specific: it is larger at horizons four and five than at horizons one to three, because the short horizon is dominated by the current level and the long horizon by the growth rate.
+$$ \mathcal{T}_{c,m} = \{t \le m : y_{c,t} \text{ observed}\}. $$
 
-H3. The same protocol applied to a second series with a different data generating process produces no winner, and the null is reported unchanged.
+A forecasting method is a map $f$ that receives the training window and a horizon $h$ and returns $\hat{y}_{c,m+h|m} = f(\mathcal{T}_{c,m}, h)$. The non-anticipative condition is
 
-The decision rules are equally explicit. A candidate wins if it has the lowest average MASE across the five horizons. Ties are broken by the lower root mean squared error, then by the alphabetically earlier name. The winner is reported with the Diebold and Mariano statistic at each horizon, with the Harvey, Leybourne and Newbold correction, and with a Bonferroni bound over the thirteen candidates. A hypothesis is supported only if the sign is as stated and the corrected test clears the threshold that the protocol fixed; otherwise it is reported as not supported, including when the point estimate is favourable.
+$$ f(\mathcal{T}_{c,m}, h) = f(\mathcal{T}_{c,m} \cup \{y_{c,s} : s > m\}, h) \quad \text{for every } h, $$
 
-The rules are stated in the present tense because they were fixed before the results. The timestamp of the protocol file and the hash of the metrics file are recorded in the repository, so the order can be checked. The repository does not carry a third-party timestamp from before the analysis, and the claim to pre-registration rests on the dated protocol file, the run manifest and the hashes rather than on an external registry. A reader who requires an external timestamp should treat the protocol as documented rather than as registered, and the paper prefers that reading to an overclaim.
+that is, the forecast does not change when data after the origin are added to the input. The condition is stated over the function, not over the index of a loop, and Section 9 proves it in Lean for the mean forecast and for the scale used by the loss.
+
+### 3.2 Loss and scaled loss
+
+The primary loss is the mean absolute scaled error of Hyndman and Koehler (2006). For a forecast at origin $m$ and horizon $h$,
+
+$$ e_{c,m,h} = y_{c,m+h} - \hat{y}_{c,m+h|m}, \qquad q_{c,m,h} = \frac{|e_{c,m,h}|}{s_{c,m}}, $$
+
+where the scale is the mean absolute first difference of the training window,
+
+$$ s_{c,m} = \frac{1}{|\mathcal{T}_{c,m}|-1} \sum_{t \in \mathcal{T}_{c,m}, t > \min \mathcal{T}_{c,m}} |y_{c,t} - y_{c,t-1}|. $$
+
+If the scale is zero, which happens only for a constant training window, the mean absolute level is used instead. The loss is scale free, so a small market and a large market contribute comparable numbers. The secondary losses are the symmetric mean absolute percentage error and the ratio of the mean absolute error to the naive mean absolute error; both are reported in the appendix.
+
+Aggregation gives each country equal weight and each origin equal weight within a country:
+
+$$ \bar{q}_{f} = \frac{1}{C} \sum_{c=1}^{C} \frac{1}{O_c} \sum_{m \in \mathcal{O}_c} \frac{1}{H} \sum_{h=1}^{H} q_{c,m,h}(f). $$
+
+The equal weighting is a choice, and it matters. A pooled average over all errors would give more weight to countries with long histories. The protocol fixes the country as the unit of analysis, so the country average comes first and the cross-country average second.
+
+### 3.3 The selection functional
+
+The protocol does not select a model by taking the minimum of a noisy average without inference. It reports three objects. The first is the ranking by $\bar{q}_f$. The second is the family of twelve loss differentials against the benchmark,
+
+$$ d_{c,m,h}(f) = q_{c,m,h}(f) - q_{c,m,h}(\text{naive}), $$
+
+with a two-way clustered standard error and a Holm adjustment over the twelve comparisons. The third is the model confidence set of Hansen, Lunde and Nason (2011) at ninety percent, computed on the country-level mean losses with a studentised range and a country bootstrap. The three objects answer different questions: which model has the smallest average loss, which differences are distinguishable from zero, and which models cannot be excluded from the set of best models.
+
+### 3.4 The candidate set
+
+Thirteen candidates enter. They span the range from a random walk to a regularised machine learning model, and they are fixed in the protocol before the panel is evaluated.
+
+Table 1. The thirteen candidates, their tuning and their inputs.
+
+| Candidate | Family | Tuning inside the training window | Inputs |
+|:--|:--|:--|:--|
+| naive | benchmark | none | last value |
+| mean | benchmark | none | training mean |
+| drift | trend | none | first and last value |
+| linear trend | trend | none | time index |
+| log-linear trend | trend | none | log level and time index |
+| damped Holt | exponential smoothing | grid over alpha, beta, phi | level and trend |
+| ETS(A,A,N) | exponential smoothing | maximum likelihood | level and trend |
+| ARIMA(1,1,0) | autoregression | maximum likelihood | lagged differences |
+| AR(2) on differences | autoregression | least squares | two lagged differences |
+| ridge on lags | regularised regression | penalty by time series cross-validation | three lagged differences |
+| lasso on lags | regularised regression | penalty by time series cross-validation | three lagged differences |
+| random forest | machine learning | fixed, 300 trees, depth 3 | three lagged differences |
+| theta | decomposition | smoothing constant | theta line and trend |
+
+The damped Holt model follows Gardner and McKenzie (1985), the theta method Assimakopoulos and Nikolopoulos (2000), the lasso Tibshirani (1996), and the ETS specification Hyndman, Koehler, Snyder and Grose (2002).
+
+Two rules apply to every candidate. No parameter is estimated on data dated at or after the origin, and no hyperparameter is selected on the evaluation window. The damped Holt grid, the ridge and lasso penalties and the smoothing constant of the theta method are chosen inside the training window, by in-sample fit or by time series cross-validation with folds that respect the order of the data. The random forest is not tuned at all; its depth and leaf size are fixed in the protocol.
+
+### 3.5 Origins, horizons and windows
+
+The training window expands. At origin $m$ it contains every observed year up to $m$, and the minimum length is fifteen observations. The maximum horizon is five years. An origin enters the evaluation only if five future values are observed, so the last origin is 2019 for a series that ends in 2024. The panel produces 216 origins across seventeen countries, and each origin contributes five forecast errors per model, which gives 1,080 errors per model before the divergence rule and 13,610 usable errors across all models after it.
+
+The expanding window is a choice. A rolling window of twenty years is reported as a robustness check in Section 7, together with the exclusion of the crisis origins of 2009 and 2020 to 2021.
+
+### 3.6 The divergence rule
+
+A scaled loss has no upper bound. A recursive model that feeds its own forecast back into its lag structure can produce a path that grows without limit, and one such path can dominate an average of more than a thousand errors. The protocol therefore classifies a path as divergent when any of its five values is non-positive or exceeds ten times the maximum of its training window. Divergent paths are counted, reported by model and by country, and excluded from the aggregate loss. They are never replaced by another model's forecast.
+
+The rule was added after the first execution of the panel script, when one recursive specification produced explosive paths in small markets. It is reported here as a deviation, with the counts in Section 6, because a rule that removes observations has to be visible.
+
+### 3.7 Tests
+
+The primary test is a two-sided Diebold-Mariano statistic on the pooled loss differential of each candidate against the benchmark, with a two-way clustered variance:
+
+$$ \hat{V} = \hat{V}_{\text{country}} + \hat{V}_{\text{year}} - \hat{V}_{\text{cell}}, $$
+
+where each component is the cluster-robust variance of the mean differential along that dimension and the third term removes the double counting, following Cameron, Gelbach and Miller (2011). The statistic is referred to a t distribution with degrees of freedom equal to the smaller of the two dimensions minus one, which is fourteen in this panel. The Holm procedure is applied over the twelve comparisons at a familywise level of 0.05.
+
+Three secondary tests are reported. The first is the Harvey-Leybourne-Newbold version of the Diebold-Mariano test at each horizon, applied to the series of cross-country mean differentials. The second is the Giacomini-White conditional test, which regresses the differential on its lag and tests the slope with a heteroskedasticity and autocorrelation consistent variance. The third is the model confidence set described above. Section 7 reports a Monte Carlo study of the size of the first-stage tests, because the choice of variance estimator is the most consequential decision in the whole design.
+
+### 3.8 Intervals
+
+Intervals are built by split conformal prediction, separately for each horizon. For a candidate $f$, the nonconformity score of an evaluation cell is the scaled absolute error $q_{c,m,h}(f)$. Within each country, the first sixty percent of origins form the calibration set and the remaining forty percent form the evaluation set. For a target level $1-\alpha$, the quantile is
+
+$$ \hat{q}_{h} = \text{the } \left\lceil \frac{(n_h+1)(1-\alpha)}{n_h} \right\rceil \text{-th smallest score}, $$
+
+with $n_h$ the number of calibration scores at horizon $h$. The interval for a forecast in levels is $\hat{y} \pm \hat{q}_h s_{c,m}$. Empirical coverage is the share of evaluation scores that fall below $\hat{q}_h$, and it is reported for the levels 0.80, 0.90 and 0.95.
+
+Beyond the evaluated horizon of five years, the protocol extrapolates the five-year quantile by the square root of $h/5$. The rule is the one implied by a random walk, in which the variance of the error grows linearly in the horizon. It is an assumption, it is labelled as one, and the paper does not present the resulting band as a guarantee.
+
+### 3.9 The timestamp and the two deviations
+
+The protocol file `protocol/p01_protocol.yaml` has SHA256 digest `ab84f048607551395a6d23d9e07309228bbfefc7c4cd3e83b326a64e38ed708a`. On 25 November 2026 at 10:04:45 GMT, the Free TSA time-stamp authority returned a signed token with serial number 0x0A90D1DF, binding that digest to that date; the format is the one defined in RFC 3161 (Internet Engineering Task Force 2001). The token, the authority certificate and the root certificate are stored next to the protocol file. Verification requires one command:
+
+```
+openssl ts -verify -data protocol/p01_protocol.yaml \
+  -in protocol/p01_protocol.tsr \
+  -CAfile protocol/tsa_cacert.pem -untrusted protocol/tsa.crt
+```
+
+Two deviations occurred. The first is the divergence rule of Section 3.6, added after the first execution. The second concerns the ARIMA model: the first execution specified a constant in levels, which is not identified when the series is differenced once, and the model silently fell back to drift for every origin. The specification was corrected to a constant in the differenced equation, the panel was rerun, and no other model changed. Both deviations are recorded in the repository, and neither changes the ranking at the top: the benchmark leads in both executions.
+
+The single-market results of Section 6 are not covered by the timestamp. They were produced before the protocol was frozen and are reported as stage one, with the date of the earlier version. The timestamp covers the panel evaluation, which had not been run when the token was issued.
 
 ## 4 Data
 
-### 4.1 The German series
+### 4.1 The panel
 
-The primary series is the annual number of passenger car registrations in Germany from 1991 to 2025, 35 observations, taken from the Destatis GENESIS table 46131 and downloaded on 24 November 2026 (Destatis 2026). The series is held in `data/raw/destatis_pkw_neuzulassungen_jahre.csv` and is never edited in place. It runs from 2,567,103 in its lowest year to 3,807,175 in 2009, the year of the scrappage programme, and it contains three events that dominate any comparison: the reunification boom of the early 1990s, the 2009 programme, which pulled forward demand and produced a 23 percent rise against 2008, and the 2020 collapse. The 2008 to 2010 sequence, 3,090,040 then 3,807,175 then 2,916,260, is the reason the absolute loss is used for selection. A squared loss lets those two transitions dominate the ranking of thirteen models, and the ranking then measures the crisis rather than the typical year.
+The panel is the Eurostat dataset `road_eqr_carmot`, new passenger cars by type of motor energy and engine size, annual, total motor energy and total engine size. The raw response is cached unchanged, with SHA256 digest `27c1edcd49c013e2babdfc6e8798f212bbd65f316281a3ddf06ec86acfe7e91a`, and parsed into a country-year table. Aggregates such as the European Union and the euro area are removed, because they are sums of the country series. A country enters the sample when it has at least twenty-five consecutive annual observations ending in 2024 inside the window from 1991 to 2024. Seventeen countries qualify: Belgium, Bulgaria, Cyprus, Germany, Greece, Croatia, Ireland, Italy, Lithuania, Luxembourg, Latvia, the Netherlands, Poland, Sweden, Slovenia, Switzerland and Türkiye.
 
-Annual data are used for three reasons. The question is a fifteen-year projection, and monthly seasonality is irrelevant at that horizon. The annual series is the one that is revised consistently and published without breaks. And the origins and horizons of the protocol have to be defined in the same unit as the projection, which is a year. The cost is 35 observations, and the paper is explicit that 35 observations cannot identify a complex model. That is why the candidate set contains models with three parameters at most and why the machine learning candidates are regularised.
+The rule excludes the large markets of France, Spain and the United Kingdom, which have gaps in this dataset. That is a cost. The benefit is a sample in which every country contributes a continuous history and no interpolation is needed. The excluded markets are not replaced by other sources, because mixing sources would introduce a definitional break that the protocol cannot control. Section 10 discusses the consequence for external validity.
 
-### 4.2 The Chinese series
+Table 2. The seventeen countries, their first year in the sample and their number of origins.
 
-The second series is Volkswagen Group deliveries in China from 1987 to 2025, 38 usable observations, with 2023 missing because the group changed its reporting that year. The series is held in `data/raw/vw_group_china_deliveries.csv`. It is included for a reason that is methodological rather than substantive, and the choice was made before the comparison was run. Volkswagen Group deliveries in China are the largest single market exposure of the firm that the German series describes, the series is published by the group itself in its annual report, and it runs long enough to supply twenty-one origins rather than fifteen. It also has a different data generating process, a different break structure and a different reporting authority. A series chosen because it is easy to forecast would prove nothing; a series chosen because it is the same firm in a different institutional setting is a specification check with a substantive reading, and the null it produces is informative about the method rather than about the analyst. If the protocol produces a winner on the German series and a null on the Chinese series, the difference cannot be attributed to the protocol, because the protocol is the same. That is the logic of a specification check, and it is the logic that makes the null informative.
+| Country | Code | First year | Observations | Origins |
+|:--|:--|--:|--:|--:|
+| Belgium | BE | 1998 | 27 | 8 |
+| Bulgaria | BG | 1991 | 34 | 15 |
+| Switzerland | CH | 1991 | 34 | 15 |
+| Cyprus | CY | 1991 | 34 | 15 |
+| Germany | DE | 1992 | 33 | 14 |
+| Greece | EL | 1991 | 34 | 15 |
+| Croatia | HR | 1991 | 34 | 15 |
+| Ireland | IE | 1991 | 34 | 15 |
+| Italy | IT | 1991 | 34 | 15 |
+| Lithuania | LT | 1995 | 30 | 11 |
+| Luxembourg | LU | 1998 | 27 | 8 |
+| Latvia | LV | 1995 | 30 | 11 |
+| Netherlands | NL | 1997 | 28 | 9 |
+| Poland | PL | 1991 | 34 | 15 |
+| Sweden | SE | 1991 | 34 | 15 |
+| Slovenia | SI | 1992 | 33 | 14 |
+| Türkiye | TR | 2000 | 25 | 6 |
 
-### 4.3 Transformations and the unit root question
+The seventeen series differ in level by more than an order of magnitude, from about ten thousand registrations a year in Luxembourg to more than three million in Germany. The scaled loss makes them comparable. Figure 1 shows the series with the two crisis windows shaded.
 
-Two transformations are used. The growth rate is the annual change divided by the previous level, and the log difference is the change in the natural logarithm. Both remove the level and both are used in at least one candidate. The protocol does not gate the candidate set on a unit root test. A pre-test would introduce a first-stage selection that is not in the protocol, and the power of the test with 35 observations is low. Instead, both level and growth specifications enter the candidate set, and the rolling-origin comparison decides. This is a deliberate departure from the common practice of testing, then modelling, then reporting only the model that the test selected.
+![Figure 1. New passenger car registrations in the seventeen markets, 1991 to 2024. The shaded windows mark 2009 and 2020 to 2021.](../figures/fig_p01_series.png)
 
-### 4.4 The scale
+### 4.2 Breaks and shocks
 
-The scale at origin $m$ is the in-sample mean absolute error of the naive forecast on the window that ends at $m$,
+Three events dominate the variance. The 2008 to 2009 financial crisis produced double-digit declines in most markets, with scrappage schemes that pulled purchases forward and created a rebound in 2010. The 2020 pandemic closed dealerships for part of the year, and the 2021 to 2022 semiconductor shortage constrained supply after demand had recovered. A model that is evaluated across these events is being asked to forecast a series with large common shocks, which is precisely the configuration in which the standard test understates uncertainty.
 
-$$
-q_m = \frac{1}{T_m - 1} \sum_{t=2}^{T_m} \left| y_t - y_{t-1} \right|, \tag{1}
-$$
+The protocol does not remove the crisis years from the primary evaluation, because a forecast comparison that excludes the hard years is not a forecast comparison. It reports a robustness check without them. The check matters for the interpretation: if the ranking is stable with and without the crises, the conclusion does not depend on three observations per country.
 
-where $T_m$ is the number of observations available at origin $m$. The scale is recomputed at every origin, so a model that is evaluated in a volatile window is not punished for the volatility of a different window. The consequence is that the naive benchmark does not score exactly one, and the paper reports the benchmark score rather than assuming it.
+### 4.3 The German case and the Chinese control
 
-## 5 Protocol
+Two series outside the panel are used. The German series from Destatis runs from 1991 to 2025 and serves two purposes: it is the sample of the single-market stage, and it is the origin of the 2040 projection. Its 2025 value is 2,857,591 registrations.
 
-### 5.1 Objects and the non-anticipative condition
+The Chinese series is the Volkswagen Group's annual deliveries in China. It is used as a held-out negative control: a series with structural breaks, a reporting change and a missing year, on which the protocol is expected to struggle. A method that wins on the panel and also wins on the control would be suspicious, because the control was chosen to violate the stationarity assumption that the panel approximately satisfies.
 
-Let $y_t$ be the series observed at annual dates $t = 1, \dots, T$. A forecast produced at origin $m$ for horizon $h$ is written $\hat{y}_{m+h \mid m}$, where $m$ is the last year whose data are used. The information set is $\mathcal{F}_m$, the sigma algebra generated by $y_1, \dots, y_m$. A forecaster is a measurable map $f_h$ from that information set to the real line,
+## 5 Results
 
-$$
-\hat{y}_{m+h \mid m} = f_h(y_1, \dots, y_m), \qquad h \geq 1. \tag{2}
-$$
+### 5.1 The ranking
 
-Definition 1. A forecaster is non-anticipative if (2) holds, that is, if the forecast is a function of the information set alone and not of any observation dated after the origin.
+Table 3 reports the mean scaled error of each candidate over the panel, with the difference from the benchmark in percent. The benchmark is first. Damped Holt is second, 2.9 percent worse, and the theta method is third, 6.0 percent worse. The remaining ten candidates are between 18 and 46 percent worse than a forecast that repeats the last observed value.
 
-Every result in the paper is conditional on Definition 1. The rolling-origin procedure satisfies it by construction, and the Lean module proves the property for the index sets that the procedure uses.
+Table 3. Mean absolute scaled error over the panel, by candidate.
 
-### 5.2 Loss and scaled loss
+| Rank | Candidate | Mean scaled error | Difference from naive, percent |
+|--:|:--|--:|--:|
+| 1 | naive | 1.913 | 0.0 |
+| 2 | damped Holt | 1.969 | 2.9 |
+| 3 | theta | 2.028 | 6.0 |
+| 4 | ARIMA(1,1,0) | 2.257 | 18.0 |
+| 5 | drift | 2.258 | 18.0 |
+| 6 | ETS(A,A,N) | 2.308 | 20.6 |
+| 7 | AR(2) on differences | 2.318 | 21.2 |
+| 8 | ridge on lags | 2.330 | 21.8 |
+| 9 | mean | 2.350 | 22.9 |
+| 10 | lasso on lags | 2.392 | 25.0 |
+| 11 | random forest | 2.458 | 28.5 |
+| 12 | linear trend | 2.595 | 35.6 |
+| 13 | log-linear trend | 2.785 | 45.6 |
 
-The error of a forecast is the realised value minus the forecast,
+The ordering is stable across horizons. Figure 2 plots the four leading candidates by horizon. The benchmark is lowest at every horizon, and the gap narrows with the horizon: damped Holt is 10.3 percent worse at one year and 1.2 percent worse at five, while the theta method is 17.8 percent worse at one year and 3.2 percent worse at five. The ordering never reverses, and the narrowing is the reason the long-horizon comparison is the harder test for a challenger.
 
-$$
-e_{m+h \mid m} = y_{m+h} - \hat{y}_{m+h \mid m}. \tag{3}
-$$
+![Figure 2. Mean absolute scaled error by horizon for the benchmark and the three closest challengers.](../figures/fig_p01_horizon.png)
 
-The absolute loss is $L_1(e) = |e|$ and the squared loss is $L_2(e) = e^2$. Selection uses the absolute loss, because the absolute loss is consistent for the conditional median and the median is the object a planning department needs: the typical year, not the average of a distribution with a long right tail. The squared loss is reported as a root mean squared error in vehicles and used only as the first tie-break.
+The ranking does not depend on the weighting at the top. A pooled average over all errors, which gives more weight to countries with long histories, leaves the first three places unchanged and permutes only the middle of the table. The equal-country mean is the statistic that the protocol fixes, and it is the one reported throughout.
 
-At horizon $h$, with $N_h$ origins, the scaled loss is
+### 5.2 Inference
 
-$$
-\mathrm{MASE}_h = \frac{1}{N_h} \sum_{m \in \mathcal{M}_h} \frac{\left| e_{m+h \mid m} \right|}{q_m}, \tag{4}
-$$
+Table 4 reports the loss differential of each candidate against the benchmark, with the two-way clustered standard error, the confidence interval, the t statistic, the p value and the Holm-adjusted p value. Negative values mean that the candidate is better than the benchmark; all point estimates are positive, so no candidate is better.
 
-and the aggregate that the selection rule uses is the unweighted mean over the five horizons,
+Table 4. Loss differentials against the naive benchmark, two-way clustered by country and year.
 
-$$
-\mathrm{MASE} = \frac{1}{H} \sum_{h=1}^{H} \mathrm{MASE}_h, \qquad H = 5. \tag{5}
-$$
+| Candidate | Differential | 95 percent interval | t | p | Holm p |
+|:--|--:|:--|--:|--:|--:|
+| damped Holt | 0.053 | -0.105 to 0.211 | 0.72 | 0.484 | 0.484 |
+| theta | 0.115 | -0.082 to 0.312 | 1.25 | 0.232 | 0.463 |
+| ARIMA(1,1,0) | 0.219 | 0.110 to 0.327 | 4.33 | 0.001 | 0.008 |
+| drift | 0.229 | 0.118 to 0.341 | 4.40 | 0.001 | 0.007 |
+| ETS(A,A,N) | 0.270 | -0.023 to 0.564 | 1.98 | 0.068 | 0.273 |
+| AR(2) on differences | 0.274 | 0.044 to 0.504 | 2.56 | 0.023 | 0.160 |
+| ridge on lags | 0.296 | 0.076 to 0.515 | 2.89 | 0.012 | 0.106 |
+| lasso on lags | 0.336 | 0.044 to 0.628 | 2.47 | 0.027 | 0.160 |
+| random forest | 0.366 | 0.162 to 0.570 | 3.84 | 0.002 | 0.018 |
+| mean | 0.438 | -0.059 to 0.934 | 1.89 | 0.079 | 0.273 |
+| linear trend | 0.682 | 0.102 to 1.261 | 2.52 | 0.024 | 0.160 |
+| log-linear trend | 0.873 | 0.186 to 1.559 | 2.73 | 0.016 | 0.131 |
 
-The unweighted mean is a choice. It gives the five-year horizon the same weight as the one-year horizon, which is the right choice when the object of interest is the long projection and the wrong choice when the object is next year's plan. The paper states the choice so that a reader who disagrees can recompute the ranking with weights, and section 7 reports what happens when the loss changes.
+Two candidates are significantly worse than the benchmark after Holm: drift and ARIMA, at 0.007 and 0.008. The random forest is also rejected at 0.018. The remaining differences are not distinguishable from zero at the familywise level. The two closest challengers, damped Holt and theta, have intervals that include zero by a wide margin.
 
-### 5.3 The selection functional
+The comparison between the one-way and two-way clustered p values is instructive even where neither rejects. For damped Holt the one-way value is 0.404 and the two-way value is 0.484; for theta the values are 0.128 and 0.232. The two-way standard error is between a sixth and a quarter larger, and the difference grows with the number of years in which the errors move together. Section 7 shows which of the two is right: in a design calibrated to this panel the one-way procedure rejects a true null in thirty percent of samples, while the two-way procedure holds the size at 4.8 percent.
 
-A selection rule is a function of the backtest output. Let $C$ be the candidate set, with $|C| = 13$, and let $\bar{M}(c)$, $R(c)$ and $\nu(c)$ be the average MASE, the root mean squared error and the name of candidate $c$. The score is the triple
+The model confidence set at ninety percent contains all thirteen candidates. With seventeen clusters and a studentised range, the set cannot exclude any model, including the linear trend that is 36 percent worse than the benchmark. That is not a contradiction of Table 4. The pairwise tests ask whether a specific difference is zero, and they have more power against specific alternatives. The confidence set asks whether a model can be excluded from the set of best models, and with seventeen clusters it cannot. The result is a statement about the limits of the sample, and it is reported rather than hidden.
 
-$$
-s(c) = \left( \bar{M}(c), R(c), \nu(c) \right) \in \mathbb{R} \times \mathbb{R} \times \Sigma^{*}, \tag{6}
-$$
+### 5.3 Where the models help and where they hurt
 
-ordered lexicographically, and the selection functional is
+The country-level pattern is heterogeneous. Figure 3 maps, for each country, the percentage by which the best non-naive candidate beats the benchmark. Positive values mean that at least one flexible model improves on the naive forecast in that country; negative values mean that none does.
 
-$$
-S(C) = \arg\min_{c \in C} s(c). \tag{7}
-$$
+![Figure 3. The best non-naive candidate against the benchmark, by country, in percent. Positive values mean that a flexible model improves on the naive forecast.](../figures/fig_p01_map.png)
 
-The order is total on a finite set, so the minimum exists and is unique. The rule is fixed in advance, which is what separates it from a rule chosen after the table is seen. The Lean theorem `selectBest_det` states that identical inputs give identical outputs, which is the formal content of that sentence.
+The dispersion is large. In the Netherlands the best flexible model improves on the benchmark by 46.5 percent, in Slovenia by 31.7, in Ireland by 29.2, in Germany by 24.9, in Belgium by 18.6 and in Luxembourg by 17.5. In Cyprus the best flexible model is 19.3 percent worse than the benchmark, in Bulgaria 18.3 percent worse, and in Poland, Latvia, Croatia, Lithuania, Switzerland and Italy between 1.4 and 6.1 percent worse. Greece, Türkiye and Sweden sit close to zero on the positive side. The map is the visual form of the paper's argument: the value of a flexible model is a property of the market and the period, not of the model alone. A study that samples one country can land on either side of zero.
 
-### 5.4 The candidate set
+The forest plot in Figure 4 shows the same heterogeneity in the inferential metric. Each point is a mean differential against the benchmark, and each bar is a two-way clustered interval. The intervals are wide, they overlap, and the two closest challengers cannot be separated from zero.
 
-The thirteen candidates are fixed before the backtest and are listed in Table 1. The set is deliberately unbalanced: it contains two benchmarks, six econometric models, four machine learning models and one combination. The purpose is not to give every family an equal chance but to make the comparison informative about the families that a manufacturer would actually consider. Table 2 counts what each candidate is allowed to fit, because a ranking that hides the capacity of the entrants is a ranking that invites the wrong objection.
+![Figure 4. Mean loss differentials against the benchmark with two-way clustered intervals. Negative values would mean that the candidate is better.](../figures/fig_p01_forest.png)
 
-Table 1. The thirteen candidates, fixed before the backtest.
+### 5.4 The Chinese control
 
-| Candidate | Family | Specification |
-|:--|:--|:--|
-| naive | benchmark | last observed level |
-| drift | benchmark | last level plus average historical change |
-| loglinear | econometric | linear trend on the logarithm of the level |
-| ar1_levels | econometric | first order autoregression on the level, rolling window, slope clipped to 0 to 0.98 |
-| ar1_growth | econometric | first order autoregression on the growth rate |
-| holt | econometric | Holt linear trend, additive |
-| holt_damped | econometric | Holt with a damped trend |
-| arima_111 | econometric | ARIMA(1,1,1) without drift |
-| ridge_lags | machine learning | ridge on three lagged growth rates, penalty fixed at 1.0 |
-| ridge_ml | machine learning | ridge on three lags, two growth rates and a time index, penalty fixed at 1.0 |
-| random_forest | machine learning | random forest on six features, 400 trees, minimum leaf 2 |
-| gradient_boosting | machine learning | gradient boosting on six features, 300 trees of depth 2, learning rate 0.05 |
-| combination | ensemble | equal weights on drift, holt and ridge_lags |
+On the Chinese deliveries series no candidate beats the benchmark. The scaled error of the naive forecast is 7.78, which is large in absolute terms because the series contains a structural break and a missing year, and the scaled errors of the flexible candidates are between 8 and 15. The result is reported as a negative control: the protocol does not manufacture a winner where the data do not contain one. The large scale is itself informative. It says that the naive scale, computed on a series with a break, is a poor normaliser, and it is the reason the paper reports the scaled loss alongside the unscaled error in the appendix.
 
-Table 2. Capacity of the thirteen candidates, counted from the code that ran the backtest.
+## 6 The single-market illusion
 
-| Candidate | Free coefficients | Tuned hyperparameters | Inputs |
-|:--|--:|--:|--:|
-| naive | 0 | 0 | 0 |
-| drift | 2 | 0 | 1 |
-| loglinear | 2 | 0 | 1 |
-| ar1_growth | 2 | 0 | 1 |
-| ar1_levels | 2 | 0 | 1 |
-| holt | 2 | 2 | 1 |
-| holt_damped | 2 | 3 | 1 |
-| arima_111 | 3 | 0 | 1 |
-| combination | 0 | 0 | 3 |
-| ridge_lags | 4 | 0 | 3 |
-| ridge_ml | 7 | 0 | 6 |
-| random_forest | 0 | 3 | 6 |
-| gradient_boosting | 0 | 3 | 6 |
+### 6.1 What the first version found
 
-The winner sits in the middle of the table, with four coefficients against two for the autoregression that finishes second, and the two candidates with the largest capacity, the forest and the boosting machine, finish third and tenth. A forest has no coefficient that can be counted, but with a minimum leaf of two and a training window that starts at fifteen observations it can grow at most seventeen leaves per tree, and the boosting machine grows four leaves in each of three hundred trees. The comparison is therefore not like for like in capacity, and the paper does not claim that it is. What the table establishes is that the winner is not the most flexible entrant and that the ranking is not a story about capacity.
+The first version of this study evaluated thirteen models on German registrations from 1991 to 2025, with origins from 2006 to 2020, horizons from one to five years and the same scaled loss. It reported that a flexible model beat the naive benchmark by about 19 percent, that the improvement grew with the horizon, and that the result survived a battery of robustness checks. The finding was internally consistent: the model was estimated only on training data, the loss was scale free, and the test was corrected for the overlap induced by multi-step forecasts.
 
-Two constraints apply to every candidate. No candidate may use an observation dated at or after the origin, and no hyperparameter may be selected on the evaluation sample. The constants are fixed in the code before the backtest: the ridge penalty at 1.0, the forest at 400 trees with a minimum leaf of 2, the boosting machine at 300 trees of depth 2. None of them is tuned on the evaluation sample, because none of them is tuned at all. The Holt and damped Holt models are the exception, and their two and three smoothing constants are chosen by a grid search inside each training window, which is the only split that respects the arrow of time.
+The first version also reported a 2040 projection of 3.16 million registrations with an interval from 2.56 to 3.69 million. The interval was calibrated on errors at horizons of one to five years and applied to a horizon of fifteen. That extrapolation was the weakest part of the paper, and the panel makes the weakness visible.
 
-### 5.5 Origins, horizons and windows
+### 6.2 The same models on two samples
 
-The origins run from 2006 to 2020, fifteen origins. At origin $m$ the training window starts in 1991 and ends at $m$, so the window expands. The minimum training length is fifteen observations, which is reached at the first origin. Each model is asked for horizons one to five, so each model produces $15 \times 5 = 75$ errors and each horizon has fifteen errors. The evaluation targets therefore run from 2007 to 2025, nineteen distinct years, which is the source of the overlap that the test has to correct. Two index conventions meet at this point and the paper states both. In the data, years are numbered from one and the window at origin $m$ contains observations 1 to $m$, the origin year included, because the origin year is observed before the forecast is made. In the Lean module, indices start at zero, so the same window is the set of indices strictly below the origin index, which is what `trainIdx_lt` states. The theorem and the code say the same thing in different numbering, and the translation is one line of arithmetic.
+To compare like with like, the model set of the first version was re-estimated on both samples with the specifications written in that version: thirteen candidates including an autoregression on levels, an autoregression on growth rates, a six-feature ridge with a fixed penalty, a gradient boosting machine and an equal-weight combination. Table 5 reports the mean scaled error on Germany and on the panel, the two ranks and the share of divergent paths.
 
-The evaluation ends at the 2020 origin, whose last target is 2025. The projection uses a separate origin, 2025, which is not part of the evaluation: the model is refitted on the full sample and iterated to 2040 at horizons one to fifteen. The projection is not evaluated, because the future is not available; it is reported with an interval built from the backtest errors, and the interval is the object that carries the uncertainty.
+Table 5. The first-version model set on Germany and on the panel.
 
-### 5.6 Tests
+| Candidate | Germany | Rank | Panel | Rank | Divergent, percent |
+|:--|--:|--:|--:|--:|--:|
+| AR(1) on levels | 1.292 | 1 | 2.014 | 4 | 0.0 |
+| ridge on three lags | 1.360 | 2 | 2.372 | 9 | 0.9 |
+| random forest | 1.509 | 3 | 2.004 | 3 | 0.0 |
+| six-feature ridge | 1.549 | 4 | 2.557 | 10 | 5.6 |
+| combination | 1.582 | 5 | 2.185 | 5 | 0.5 |
+| naive | 1.585 | 6 | 1.913 | 1 | 0.0 |
+| ARIMA(1,1,1) | 1.592 | 7 | 2.256 | 6 | 5.1 |
+| log-linear trend | 1.637 | 8 | 2.785 | 13 | 0.0 |
+| gradient boosting | 1.649 | 9 | 2.002 | 2 | 0.0 |
+| drift | 1.655 | 10 | 2.258 | 7 | 3.2 |
+| damped Holt | 1.655 | 10 | 2.258 | 7 | 3.2 |
+| AR(1) on growth | 1.946 | 12 | 2.717 | 11 | 0.0 |
+| Holt | 2.065 | 13 | 2.774 | 12 | 6.5 |
 
-The comparison of two sequences uses the loss differential
+On Germany, the autoregression on levels beats the benchmark by 18.5 percent and the benchmark ranks sixth. On the panel, the same model is fourth, 5.3 percent worse than the benchmark, and the benchmark is first. The rank correlation between the two evaluations is 0.41, with a p value of 0.16; the two rankings are not statistically distinguishable from unrelated orderings. The six-feature ridge falls from fourth to tenth and diverges in 5.6 percent of its paths.
 
-$$
-d_{m,h} = \left| e^{(A)}_{m,h} \right| - \left| e^{(0)}_{m,h} \right|, \tag{8}
-$$
+The divergence pattern is informative. The models that feed forecasts back into their own lag structure, the six-feature ridge, the ARIMA(1,1,1), the Holt and the drift, produce explosive paths in small markets where the level is close to zero relative to its historical variation. The models that predict a transformation and invert it, or that average several forecasts, do not. The first version could not see this because it evaluated one large and stable market.
 
-with $A$ the candidate and $0$ the naive benchmark. The long run variance uses a Bartlett kernel truncated at $h-1$ lags, because forecasts $h$ steps ahead overlap by $h-1$ target years,
+### 6.3 Why the ranking does not travel
 
-$$
-\hat{V}_h = \hat{\gamma}_0 + 2 \sum_{k=1}^{h-1} \left(1 - \frac{k}{h}\right) \hat{\gamma}_k, \qquad
-\mathrm{DM}_h = \frac{\bar{d}_h}{\sqrt{\hat{V}_h / N_h}}. \tag{9}
-$$
+Three mechanisms explain the gap. Sampling variation comes first: fifteen origins and five horizons give 75 errors per model, and the standard error of a mean scaled error of about 1.5 is large enough to move a model several ranks, while the panel multiplies the origins by fourteen. The second is the common shock: in a single market a model that happens to fit 2009 and 2020 looks better than it is, because those observations carry a large share of the variance, and in a panel the same shock appears in every country. The third is the interaction between model and market: a linear trend is a good forecast for a market converging to a stable level and a bad one for a market that is cycling. A single-market study estimates that interaction for one market and reports it as a property of the model.
 
-With fifteen origins the normal reference is too generous, so the Harvey, Leybourne and Newbold correction scales the statistic and refers it to a $t$ distribution with $N_h - 1$ degrees of freedom,
+None of this is exotic, and together the mechanisms imply that a single-market comparison is a weak instrument for model selection. The panel does not prove that flexible models are useless; it shows that the evidence for their value is weaker than a single-market backtest suggests.
 
-$$
-\mathrm{DM}^{\mathrm{HLN}}_h = \mathrm{DM}_h \sqrt{\frac{N_h + 1 - 2h + h(h-1)/N_h}{N_h}}. \tag{10}
-$$
+### 6.4 What survives
 
-The pooled statistic that stacks the 75 errors is reported in the metrics file and is not used as a test. The reason is stated in section 2.3: the 75 errors are not 75 independent observations, and a variance truncated at zero lags understates the dependence.
+Two results survive the change of sample. The benchmark is hard to beat, and the damped Holt model is a close second on both samples. On Germany, damped Holt ranks tenth in the first-version set but second in the protocol set; on the panel, it is second in both. The stability of the damped Holt result is the one positive finding about a flexible model that the paper can defend.
 
-### 5.7 The interval
-
-The interval is empirical. The relative error of the selected model is computed at every origin and horizon, the quantiles at 2.5 and 97.5 percent are taken from the pooled distribution, and the bounds are applied to the point projection. The lower bound is clipped at zero, because registrations cannot be negative. The interval is therefore a statement about the errors that the model actually made, not a statement derived from a Gaussian assumption that the errors do not satisfy.
-
-### 5.8 The Lean module
-
-The deterministic skeleton of the split is written in Lean 4.36.0 without Mathlib. The module defines the training index set at an origin, the expanding window and the fixed length window, and it proves nine theorems. Four carry the property that matters: every index in the training set is strictly below the origin (`trainIdx_lt`), the origin is never in the training set (`origin_not_in_train`), the expanding window is nested (`trainIdx_mono`), and a fixed length window ending before the origin never reaches it (`rollIdx_lt`). Selection is a fold over the candidate list (`selectBest`), and `selectBest_det` states that it is a function. The module compiles in seconds and has no dependency on Mathlib (The Mathlib Community 2020). It does not formalise estimation, asymptotics, the projection or the interval, and the paper does not claim that it does. The distinction matters for how the rest of the paper should be read. The kernel certifies that no observation dated at or after the origin can enter the training set and that the selection is a deterministic function of the backtest output. It says nothing about whether the loss is the right loss, whether the test has the right size, or whether the projection is accurate. A reader who wants a proof of the forecast will not find one in the module, and the paper does not offer one.
-
-### 5.9 Pseudocode
-
-The procedure is short enough to state in full.
-
-```
-protocol(y, candidates, origins, horizons, loss, scale):
-    for m in origins:
-        train = y[1 .. m]                      # proved: no index >= m
-        for h in horizons:
-            for c in candidates:
-                theta = fit(c, train)          # hyperparameters inside train only
-                yhat[c, m, h] = predict(c, theta, h)
-                e[c, m, h] = y[m + h] - yhat[c, m, h]
-    for c in candidates:
-        score[c] = (mean_h mean_m |e[c]| / scale(train_m), rmse(c), name(c))
-    winner = argmin_lex(score)
-    report(winner, dm_by_horizon(winner, naive), interval(winner))
-```
-
-The pseudocode is the protocol in operational form. The comment on the first line is the theorem, not a hope.
-
-## 6 Results
-
-### 6.1 The ranking
-
-Table 3 reports the thirteen candidates in the order fixed by the selection functional. Ridge regression on three lagged growth rates is first with an average MASE of 1.2839, a root mean squared error of 335,728.61 vehicles and a bias of minus 125,280.19. The naive benchmark is sixth with 1.5952, and the gap is 0.3113 scaled units, or 19.5 percent of the benchmark. The autoregression on levels is second at 1.4315, which is consistent with the persistence of the series: a short rolling window with a clipped slope is a disciplined way to use the level. The random forest is third at 1.4829, ahead of the equal-weight combination at 1.5544 and ridge on lags with time features at 1.5558, and gradient boosting is tenth at 1.6559, which is the familiar result that boosted trees need more data than 35 annual observations.
-
-Table 3. Backtest results, German registrations, fifteen origins and five horizons.
-
-| Rank | Candidate | Family | MASE | RMSE | Bias |
-|--:|:--|:--|--:|--:|--:|
-| 1 | ridge_lags | machine learning | 1.2839 | 335,728.61 | -125,280.19 |
-| 2 | ar1_levels | econometric | 1.4315 | 362,808.50 | -164,271.41 |
-| 3 | random_forest | machine learning | 1.4829 | 386,614.64 | -154,135.10 |
-| 4 | combination | ensemble | 1.5544 | 430,812.04 | -94,694.75 |
-| 5 | ridge_ml | machine learning | 1.5558 | 408,552.58 | -184,112.17 |
-| 6 | naive | benchmark | 1.5952 | 451,926.96 | -119,880.25 |
-| 7 | holt_damped | econometric | 1.5989 | 444,472.01 | -114,556.10 |
-| 8 | arima_111 | econometric | 1.6078 | 443,993.50 | -76,389.92 |
-| 9 | loglinear | econometric | 1.6338 | 410,688.66 | -237,333.96 |
-| 10 | gradient_boosting | machine learning | 1.6559 | 439,249.86 | -159,726.12 |
-| 11 | drift | benchmark | 1.6734 | 472,196.48 | -82,018.72 |
-| 12 | ar1_growth | econometric | 1.9174 | 576,204.74 | -150,518.36 |
-| 13 | holt | econometric | 1.9288 | 548,451.72 | -76,785.33 |
-
-Two features of the table matter for interpretation. The spread between the first and the last candidate is 0.6449 scaled units, which is large relative to the differences among the top five, and it says that the choice of family matters more than the choice of hyperparameter within a family. The bias is negative for every candidate, which means that every model underpredicts on average over the evaluation period, and the smallest bias belongs to arima_111 at minus 76,389.92, not to the winner. A model can win on absolute error and still carry a bias, and the paper reports both.
-
-### 6.2 The horizon profile
-
-The average MASE hides the horizon. Table 4 reports the winner against the benchmark at each horizon, with the loss differential in vehicles, the Diebold and Mariano statistic, the Harvey, Leybourne and Newbold correction, the p value from the corrected statistic, and a bootstrap p value computed by resampling the fifteen origins and re-estimating the long-run variance in every resample.
-
-Table 4. Ridge on lagged growth against naive, by horizon, Germany.
-
-| Horizon | MASE, ridge | MASE, naive | Gain, vehicles | DM | DM corrected | p value | Bootstrap p |
-|--:|--:|--:|--:|--:|--:|--:|--:|
-| 1 | 1.1333 | 1.2397 | -20,859 | -0.402 | -0.388 | 0.7037 | 0.7244 |
-| 2 | 1.2900 | 1.5258 | -50,628 | -1.033 | -0.929 | 0.3685 | 0.5200 |
-| 3 | 1.3639 | 1.5784 | -48,663 | -1.029 | -0.857 | 0.4061 | 0.5102 |
-| 4 | 1.3186 | 1.7769 | -104,632 | -3.800 | -2.911 | 0.0114 | 0.2196 |
-| 5 | 1.3135 | 1.8550 | -127,569 | -4.303 | -3.009 | 0.0094 | 0.3232 |
-
-The profile is the finding. The point estimate is better at every horizon, and the gain grows from 20,859 vehicles at one year, 7.6 percent of the naive error, to 127,569 vehicles at five years, 29.9 percent. The pre-specified statistic rejects equal accuracy at four years, minus 2.911 with a p value of 0.011, and at five years, minus 3.009 with 0.009. It does not reject at one to three years, where the statistic is below one in absolute value.
-
-The bootstrap is the standard remedy when the variance is estimated rather than known (Efron and Tibshirani 1993), and the column is the reason the paper does not stop there. When the fifteen origins are resampled and the long-run variance is estimated again in each resample, the same statistic produces p values of 0.220 at four years and 0.323 at five. The asymptotic p value treats the estimated variance as known. With fifteen observations and three autocovariances the variance is itself a random quantity with a wide distribution, and the bootstrap says so. The pre-specified test is reported because the protocol fixed it, the bootstrap is reported because the protocol is supposed to be auditable, and the two disagree.
-
-The direction of the overlap correction explains part of the disagreement. The usual warning is that ignoring overlap understates the variance and overstates significance, which assumes positively autocorrelated differentials. Here the estimated autocovariances are negative: at four years the first two are minus 14.8 billion and minus 11.8 billion, so the corrected variance is about a quarter of the zero-lag variance and the statistic rises from minus 1.874 to minus 3.800 before the small sample factor shrinks it to minus 2.911. The differential alternates with the cycle, with a large favourable value at the 2009 origin and a large unfavourable one at 2020, and alternation is negative autocorrelation. A variance estimated from three such autocovariances is a fragile object, and the bootstrap is the check that makes the fragility visible.
-
-### 6.3 The projection and the interval
-
-The selected model is projected from the 2025 origin to 2040. The point forecast is 3,161,958.51 registrations. The empirical 95 percent interval runs from 2,563,157.85 to 3,689,022.75, a width of 1,125,864.90 vehicles, about 36 percent of the point. The interval is asymmetric in proportional terms: the lower bound is 18.9 percent below the point and the upper bound is 16.7 percent above it, because the distribution of relative errors has a longer right tail than left.
-
-The interval is the object the paper recommends for planning. A point forecast invites a decision at the point, and a decision at the point is a decision at the 50th percentile of a distribution whose 5th percentile is 700,000 vehicles lower. A corridor invites a decision that is robust to the range, which is the form in which capacity, sourcing and workforce plans are actually made.
-
-### 6.4 The Chinese null
-
-The same protocol is applied to Volkswagen Group deliveries in China. No candidate beats the random walk. The best scaled error in the set is 7.7778, the corrected test against naive gives a p value of 0.9615, and the autoregression on levels comes closest to the benchmark without beating it. The scale is large because the Chinese series moves by millions of vehicles between adjacent years, and a scaled error of 7.7778 is a statement about the scale of the breaks, not about the quality of the code.
-
-The result is reported unchanged. It is the specification check that the protocol needs: a method that produces a winner on one series and a null on another, with the same rule and the same code, is a method that is measuring something about the series rather than something about the analyst. The null also has a substantive reading, which is that the Chinese series behaves like a random walk over the evaluation period, and a random walk is a level model with a unit root. Chapter 11 of the dissertation treats the Chinese path as a set of conditional scenarios rather than as a forecast, and the paper does not repeat that argument.
+The negative findings are stronger. A linear trend, a log-linear trend, a random forest and a six-feature ridge are all worse than the benchmark on the panel, and several of them are significantly worse after Holm correction. The machine learning models do not fail because they are badly implemented; they fail because the signal in an annual national registration series is weak relative to the noise, and a flexible function fits the noise.
 
 ## 7 Robustness
 
-### 7.1 Leave one origin out
+### 7.1 Five checks fixed before estimation
 
-The check deletes each origin in turn, recomputes the average MASE on the remaining fourteen, and records the rank of the winner. Ridge on lagged growth is first in fifteen of fifteen deletions. The ratio to naive ranges from 0.7415, when 2020 is deleted, to 0.8816, when 2009 is deleted, so the reduction lies between 11.84 and 25.85 percent. The smallest margin over the runner-up is 0.1062, which occurs when 2009 is removed, and the largest is 0.1599. The deletion changes the size of the gain and not its sign.
+The protocol lists five checks that change one ingredient each: the origins, the training window, the loss, the countries and the penalty. All five were run after the timestamp and are reported whether or not they support the ranking.
 
-The 2009 case is the expected extreme. That origin is the most favourable for the model at four years, with a contribution of minus 522,931 vehicles, so removing it shrinks the apparent gain. The 2020 case is the other extreme: the 2024 level, 2,817,331, was close to the 2020 level, 2,917,678, so the flat forecast was nearly right and the model's advantage narrowed. Neither deletion moves the winner.
+Table 6. Robustness checks against the main ranking.
 
-### 7.2 Alternative losses
+| Check | What changes | Cells | Naive | Best challenger | Challenger | Naive rank |
+|:--|:--|--:|--:|--:|:--|--:|
+| Main specification | nothing | 13,610 | 1.913 | 1.969 | damped Holt | 1 |
+| Crisis exclusion | origins 2008 and 2009 removed | 12,065 | 1.766 | 1.778 | damped Holt | 1 |
+| Rolling window | 20-year window replaces expanding | 8,090 | 1.892 | 1.907 | theta | 1 |
+| Symmetric loss | sMAPE replaces scaled absolute error | 13,610 | 0.297 | 0.327 | damped Holt | 1 |
+| Leave one country out | one country removed, 17 folds | 17 folds | - | - | - | 1 in 17 |
+| Fixed penalty | ridge alpha set to 0.1, 1, 10 | 13,610 | 1.896 | 2.028 | ridge, alpha 10 | 1 |
 
-Five alternative criteria are computed on the same errors: mean absolute error, root mean squared error, median absolute error, mean absolute percentage error and a trimmed mean that removes the three largest absolute errors per model. The winner is first under all five, with a ratio to naive between 0.7429 and 0.8634. The Spearman correlation between the MASE ranking and the alternative rankings is 0.995 for mean absolute error, 1.000 for percentage error, 0.995 for the trimmed mean, 0.857 for the root mean squared error and 0.516 for the median absolute error. The top is stable and the middle is not, which is the correct reading: the identity of the winner does not depend on the loss, and the ordering of the candidates below the top does.
+The table is the robustness statement in one place: the benchmark is first in every check, and the runner-up changes only between damped Holt and theta.
 
-### 7.3 Multiplicity
+### 7.2 The crisis and the window
 
-Thirteen candidates and five horizons are sixty comparisons against the benchmark, and a nominal five percent threshold is not a family-wise five percent. Three corrections are reported, because they answer three different questions.
+The crisis check removes the origins of 2008 and 2009, which are the two origins whose five-year windows contain the financial crisis and the collapse of the German scrappage programme. The benchmark improves from 1.913 to 1.766, which is expected: the crisis years are hard for every model, and removing them lowers the average error of all candidates. Damped Holt improves from 1.969 to 1.778 and comes within 0.7 percent of the benchmark. The gap between the two is now smaller than the standard error of either mean, and the paper does not claim that damped Holt is worse in a statistical sense. It claims only that it does not beat the benchmark, which is what the test in Table 4 says.
 
-The pre-registered family is the thirteen candidates at the pooled level. The archived pooled statistic gives a p value of 0.0051, and a Bonferroni bound multiplies it by thirteen to 0.0663, which does not clear five percent. The Šidák adjustment gives 0.0643 and Holm gives 0.0663. The pooled statistic itself is examined in section 7.5 and is not the test this paper defends.
+The rolling window replaces the expanding window with the last twenty observations. This is the check that most favours flexible models, because a short window adapts to the level shift after 2009 and gives the damped Holt and theta methods a cleaner signal. Theta moves to second place at 1.907, 0.8 percent worse than the benchmark at 1.892, and damped Holt falls to third at 1.945. The benchmark remains first. The exercise also shows why the protocol fixed the expanding window in advance: with a rolling window the ranking of the challengers changes, and a paper that chose the window after seeing the results could have reported either ordering as the main finding.
 
-The family that the paper does defend is the five horizon tests. A Bonferroni bound over thirteen candidates applied to the strongest horizon gives 0.0114 times thirteen, 0.148 at four years, and 0.0094 times thirteen, 0.122 at five years. Neither clears five percent.
+### 7.3 A loss that does not scale by the training window
 
-The third correction is a stepdown max-t over the thirteen candidates with the variance clustered by origin, which is the bootstrap procedure of Romano and Wolf (2005). It gives an adjusted p value of 0.420 for the winner. The only candidate that separates from the benchmark under this correction is Holt, at plus 3.181 with an adjusted p value of 0.009, and the separation is in the wrong direction: Holt is significantly worse. The design can detect a large deterioration and cannot detect a moderate improvement, which is the definition of low power and is quantified in section 7.4.
+The scaled absolute error divides by the mean absolute first difference of the training window. That normaliser is right for comparing series of different volatility, but it is not the only defensible choice, and a critic could argue that the benchmark benefits because the normaliser is computed on the same differences that the naive forecast extrapolates. The symmetric absolute percentage error removes the normaliser and divides each error by the average of the actual and the forecast.
 
-The bound over thirteen independent tests is conservative because the candidates are correlated. The mean off-diagonal correlation of the twelve pooled loss differentials is 0.237, and the eigenvalues of their correlation matrix fall from 6.093 to 0.009, so most of the twelve dimensions are one or two common factors. The effective number of tests is 3.07, which gives a family-wise error of 0.035 for the horizon test at five years and 0.031 at four. The truth lies between 0.031 and 0.148, and the paper reports the range rather than choosing the flattering end.
+Under this loss the benchmark is first at 0.297, damped Holt second at 0.327 and theta third at 0.330. The random forest, eleventh under the scaled loss, is eighth at 0.374, and the linear trend is twelfth at 0.420. The top three are unchanged, the rank correlation between the two orderings is 0.93, and the only material movement is the random forest, which gains because percentage errors penalise large errors in small markets less. The conclusion does not depend on the loss.
 
-### 7.4 What fifteen origins can detect
+### 7.4 No single country drives the result
 
-A test that does not reject is informative only if it could have rejected. Table 5 reports the minimum detectable effect at 80 percent power for each horizon, computed from the observed standard deviation of the loss differential, and the power that the design actually had at the effect that was observed.
+The leave-one-country-out check removes each of the seventeen countries in turn and recomputes the full ranking. The benchmark is first in all seventeen folds. The result is stronger than a standard error: it says that there is no single market whose removal produces a challenger ranking, which is what a critic would look for if the benchmark's advantage came from one large or one unusual country. Germany, which carries the largest weight in a pooled average, is not necessary for the result; neither is the Netherlands, which carries the largest gain for a flexible model.
 
-Table 5. What fifteen origins can detect, German series.
+The check also answers a question about the sample rule. The rule admits countries with at least twenty-five consecutive observations, and the excluded countries are mostly small markets with short histories. If the result depended on the composition of the seventeen, removing one country at a time would reveal it. It does not.
 
-| Horizon | Naive MAE | Observed gain | Percent | MDE | Percent | Power |
+### 7.5 The penalty of the ridge model
+
+The ridge model tunes its penalty at every origin over a grid from 0.01 to 100 with three expanding folds. That is defensible, but it makes performance depend on a search that is itself estimated. The check fixes the penalty at 0.1, 1 and 10 and refits at every origin without a search.
+
+The fixed-penalty versions produce mean scaled errors of 2.122, 2.103 and 2.028. The best, at a penalty of 10, is 6.0 percent worse than the benchmark and better than the tuned version at 2.330. The tuned ridge is therefore not the best ridge, which is a limitation of the candidate set rather than of the benchmark, and no fixed penalty closes the gap. The protocol did not search over penalties after the fact, because that search on the evaluation sample would be the forking path it is designed to prevent.
+
+## 8 The corridor to 2040
+
+### 8.1 Conformal calibration
+
+The interval is built by split conformal prediction on the origin dimension. The origins are ordered by year, the first sixty percent form the calibration set and the remaining forty percent the evaluation set. For each horizon the calibration set gives the empirical quantile of the absolute scaled error, and the interval is the point forecast plus and minus that quantile times the scale of the training window. The split respects the time order, so calibration errors come from earlier origins than evaluation errors. This is not the exchangeability that the conformal guarantee assumes, and the coverage below is an empirical property of this panel rather than a theorem.
+
+Table 7. Empirical coverage of the split conformal interval, by nominal level and horizon.
+
+| Horizon | 80 percent | 90 percent | 95 percent | Calibration cells | Evaluation cells |
+|--:|--:|--:|--:|--:|--:|
+| 1 | 0.884 | 0.953 | 0.988 | 130 | 86 |
+| 2 | 0.919 | 0.953 | 0.988 | 130 | 86 |
+| 3 | 0.907 | 0.942 | 0.953 | 130 | 86 |
+| 4 | 0.919 | 0.953 | 1.000 | 130 | 86 |
+| 5 | 0.907 | 0.953 | 1.000 | 130 | 86 |
+
+The interval over-covers at every level. At the ninety percent level the empirical coverage is 0.953 at both the first and the fifth horizon; at the eighty percent level it is between 0.884 and 0.919; at the ninety-five percent level it reaches one at horizons four and five. Over-coverage of this size is expected when the quantile is estimated from 130 cells and the evaluation set is small. It is also the conservative direction: a corridor that is too wide is a weaker claim than a corridor that is too narrow, and the paper prefers the weaker claim.
+
+### 8.2 The projection
+
+The point forecast for 2040 is the last observed value, 2,857,591 passenger car registrations in 2025, carried forward. This is not a prediction that demand will be flat. It is the benchmark that no candidate beat, and the protocol requires the projection to be built on the selected model, which is the benchmark. The corridor around it is the conformal quantile at the five-year horizon, 5.975 in scaled units, multiplied by the scale of the German series and by the square root of the ratio of the projection horizon to the calibration horizon.
+
+Table 8. Projection of German passenger car registrations, selected years.
+
+| Year | Lower 90 percent | Point | Upper 90 percent | Width |
+|--:|--:|--:|--:|--:|
+| 2026 | 2,277,633 | 2,857,591 | 3,437,549 | 1,159,916 |
+| 2030 | 1,560,765 | 2,857,591 | 4,154,417 | 2,593,651 |
+| 2035 | 1,023,603 | 2,857,591 | 4,691,579 | 3,667,977 |
+| 2040 | 611,423 | 2,857,591 | 5,103,759 | 4,492,336 |
+
+![Figure 5. German passenger car registrations, 1991 to 2025, and the conformal corridor to 2040.](../figures/fig_p01_fan.png)
+
+### 8.3 How to read the corridor
+
+The corridor is wide, and its width is the result. At 2040 the ninety percent interval runs from 0.61 to 5.10 million registrations, a factor of eight between the bounds. A planning department that needs a single number for capacity will not find it here, and the paper argues that it should not look for one in any annual model with seventeen countries and thirty-four years. What the corridor provides is a disciplined statement of how much is unknown: the width comes from the errors the benchmark actually made at one to five years, extrapolated by a stated rule, and it can be compared across specifications.
+
+The comparison with the first version is the sharpest illustration. The first version reported a ninety percent band from 2.56 to 3.69 million for 2040, a width of 1.13 million. The new band is 4.49 million wide, four times wider, and the difference is not a change of data or of model but a change of calibration. The first version scaled one to five year errors linearly to fifteen years; the new version uses a quantile estimated on the panel and a square root scaling. The wider band is the more honest one, and the fact that the earlier band looked more decisive is the danger the protocol is designed to expose.
+
+The square root scaling is the one that a random walk implies for the standard deviation of the cumulative error, and it is the natural default when the model is the benchmark. It is not estimated from the data, and a different scaling would produce a different width: a linear rule would give a wider corridor and a bounded trend a narrower one. The protocol fixes the rule in advance and reports it as an assumption, so the paper's claim is conditional on it and the condition is visible.
+
+## 9 The machine-checked split
+
+### 9.1 What is formalised
+
+The Lean module formalises the two objects that the protocol depends on and that a reader cannot check by reading the Python. The first is the information split: at origin m the forecaster may use observations with indices below m and nothing else. The second is the selection: given a finite list of candidate keys, the protocol selects the smallest key in a lexicographic order that ranks origins before models.
+
+The module works with lists of rational numbers rather than real numbers. The choice keeps the development inside Lean core, avoids a dependency on a measure theory library, and makes every computation exact. The forecast is the mean of the prefix of length m; the scale is the mean absolute first difference of the same prefix; the order on keys of type Nat times Nat is defined explicitly, because Lean core has no instance for pairs. The selection is a fold over the candidate list that keeps the smaller key and breaks ties towards the earlier candidate.
+
+### 9.2 The theorems
+
+Table 9 groups the seventeen theorems by what they establish.
+
+Table 9. The verified properties and what they guarantee.
+
+| Group | Theorems | Statement in words |
+|:--|:--|:--|
+| Prefix agreement | prefix_congr | Two series that agree below m have the same prefix of length m |
+| Causality | forecast_causal, scale_causal, forecast_scale_causal | The forecast and the scale depend only on values below m |
+| Appending | forecast_append, scale_append | Adding future observations leaves the forecast and the scale unchanged |
+| Order | lexLe_refl, lexLe_trans, lexLe_antisymm, lexLe_total | The key order is a total order |
+| Selection | argmin_mem, argmin_le, argmin_unique | The selected key is a candidate, is minimal, and is unique when keys are distinct |
+| Selection steps | argminStep_eq_new_or_acc, argminStep_spec, argmin_cons_ne_none, argmin_eq_none | The fold returns the new or the incumbent key, is below both, never returns none on a nonempty list, and returns none only on the empty list |
+
+The causality theorems are the formal content of the non-anticipative condition in Section 3.1. The append theorems are the same statement in the form that a programmer uses: the forecast at origin m is invariant to data that arrive after m. The selection theorems are the formal content of the selection functional in Section 3.3: the model that the protocol reports is a member of the candidate set, no candidate is strictly better in the order, and with distinct keys it is the only such candidate.
+
+The module builds with Lean 4.36.0 and the toolchain pinned in the repository. The build exits with code zero, contains no sorry, and the axiom check reports only propext, Classical.choice and Quot.sound, which are the three axioms that Lean's standard library uses. The build log is committed with the source.
+
+### 9.3 What the proof does and does not establish
+
+The proof establishes the plumbing. It does not establish that the benchmark is hard to beat, that the two-way clustered test has correct size, or that the conformal interval covers. Those are statistical claims, and they rest on the Monte Carlo evidence in Section 7 and on the asymptotic argument in Section 3.7. A formal proof of a statistical claim would require a formalisation of the probability space, the sampling assumptions and the limiting distribution, which is a different project.
+
+The distinction matters because the paper's claim about verification is easy to overstate. What is verified is that the evaluation cannot see the future through the split, and that the selection is a well-defined minimum. Those are the two places where an implementation error would be both easy to make and hard to detect by reading the output. The claim is narrow, and it is exactly the claim that the module supports.
+
+## 10 Discussion
+
+### 10.1 Three literatures, one result
+
+The paper speaks to three literatures and the result is the same in each. The forecasting literature has known since the M competitions that simple methods are hard to beat on short annual series, and the panel confirms it on a sample that was not available to those competitions. The machine learning literature has argued that flexible models dominate when the sample is large and the signal is strong, and the panel shows that neither condition holds for annual car registrations in seventeen countries. The reproducibility literature has argued that the credibility of an empirical result depends on the ex ante specification of the analysis, and the paper provides a specification that is timestamped, hashed and, for its discrete part, verified.
+
+The contribution is not the discovery that the naive forecast is good. It is the demonstration that a pre-registered panel protocol can establish that fact with enough discipline that the result survives the checks a referee would impose, including the checks the author would prefer not to run. The model confidence set that contains all thirteen candidates, the two-way test that corrects a one-way procedure shown to over-reject, the country map and the four times wider corridor each weaken the paper's rhetorical position and strengthen its evidential one.
+
+### 10.2 For the literature and for practice
+
+Single-market forecasting studies are common in the automotive literature, and the most direct implication is that their model rankings should be read as conditional on the market. A study that reports a gradient boosting model beating the naive forecast by twenty percent on one market may be correct about that market and wrong about the technology. The panel design that would settle the question is cheap: Eurostat publishes the registrations series for forty-one countries, the sample rule is a paragraph of code, and the two-way test requires no more than a cluster-robust variance. A second implication concerns the loss: a model that diverges in five percent of its paths, as the six-feature ridge does, is not a model a planning department can use even if its average error is competitive, and the divergence rule turns that judgement into a number.
+
+The corridor is the practical object. A firm that plans capacity on a point forecast of 2.86 million registrations for 2040 is planning on a number the paper can defend only as a benchmark, with a ninety percent range from 0.61 to 5.10 million. The defensible posture is to treat the corridor as the input and to test strategies against its bounds: a capacity investment that survives 0.61 million and one that survives 5.10 million are different investments, and the difference is the value of the information the corridor says is missing. The paper does not recommend a strategy for Volkswagen or for the German industry; that is the subject of the companion papers. What it provides is the measurement layer, and a strategy built on a different layer can be compared with this one.
+
+### 10.4 Limitations
+
+The sample is seventeen countries and thirty-four years. The rule that produces it excludes France, Spain and the United Kingdom, a cost the paper accepts in exchange for a balanced panel. The frequency is annual, which limits the origins to 216 and makes five years the longest horizon the sample can support. The candidate set contains thirteen models, none with exogenous regressors, and the result that no candidate beats the benchmark is a statement about that set.
+
+The inference rests on a cluster-robust variance with seventeen clusters and fourteen degrees of freedom. The Monte Carlo shows that the two-way procedure has a size close to five percent in a design that mimics the panel, and that the one-way and bootstrap alternatives do not. It does not show that the procedure is exact in this panel, and the model confidence set, which contains all thirteen candidates, is the honest summary of what seventeen clusters can deliver.
+
+The conformal interval assumes that the calibration and evaluation errors are exchangeable in distribution. The time split makes that assumption questionable, and the empirical coverage is reported rather than asserted. The square root scaling to 2040 is an assumption, not an estimate. The timestamp proves that the protocol existed on 25 November 2026; it does not prove that the protocol is good, and it is not a substitute for peer review.
+
+Finally, the paper is written by one author and evaluated on one panel. The strongest evidence for its claims would be a replication on a different panel, a different frequency or a different industry, and the repository is structured to make that replication possible.
+
+## 11 Conclusion
+
+The paper asked whether a flexible model can beat the naive forecast of annual car registrations when the comparison is specified in advance, tested on a panel and corrected for multiplicity. The answer is no. Across thirteen candidates, seventeen countries, 216 origins and 13,610 usable errors, the benchmark is first at every horizon, the two closest challengers are not statistically distinguishable from it, and the candidates that are significantly worse after Holm are those that extrapolate a trend. The result survives the exclusion of the crisis years, a rolling window, a different loss, the removal of each country in turn and a fixed penalty for the ridge model.
+
+The paper makes four contributions. It provides a pre-registered panel protocol for forecast evaluation in a technology-intensive industry, with a frozen specification, a public timestamp and a reproducible pipeline. It shows that two-way clustering by country and year is the appropriate inference in this design, and that the one-way procedure that the first version used over-rejects by a factor of six in a Monte Carlo design calibrated to the panel. It reports a corridor to 2040 that is four times wider than the one a single-market calibration produced, and it argues that the width is the finding. It verifies the information split and the selection functional in Lean 4, so that the two discrete components of the protocol are machine-checked rather than asserted.
+
+The agenda that follows is empirical. The same protocol can be applied to monthly registrations, to other countries, to the Chinese market with a longer series and to the powertrain mix, where the question is not the level of demand but its composition. Each application would produce its own ranking, and the comparison across applications would be the evidence that a single study cannot provide. The benchmark is hard to beat, and the useful question is no longer whether a flexible model can beat it in one market, but where and under which conditions it can beat it across many.
+
+## Data and code availability
+
+The panel is built from Eurostat dataset road_eqr_carmot, downloaded on 24 November 2026, with the raw file hash recorded in the repository. The German series is from Destatis table 46131, and the Chinese control series is from the Volkswagen Group annual reports. All series, the derived tables, the figures and the Lean module are archived in the public repository at https://github.com/kajevic44-sudo/forecast2040-protocol under the tag that accompanies this version, and deposited at Zenodo with a concept DOI and a version DOI. The repository contains the protocol file and its RFC 3161 timestamp token, the acquisition and estimation scripts, the robustness checks, the Monte Carlo design, the figure scripts and the Lean development with its build log. A reader can reproduce every number in the paper by running the scripts in the order given in the README, and the hashes in the manifest identify the inputs.
+
+## Declaration of generative AI and AI-assisted technologies
+
+During the preparation of this manuscript the author used AI-assisted tools for language editing and for limited technical assistance in reviewing and supporting the preparation of analytical code. These tools supported the efficiency of the workflow and did not replace the author's independent scientific work. The research objectives, the methodology, the analytical framework, the interpretation of results and the scientific conclusions were determined and critically reviewed by the author, who verified the reported results against the underlying data and takes full responsibility for the accuracy, originality and integrity of the manuscript.
+
+## Appendix A. Additional tables
+
+Table A1. Mean scaled error by horizon, country-balanced mean.
+
+| Candidate | One year | Two years | Three years | Four years | Five years |
+|:--|--:|--:|--:|--:|--:|
+| naive | 1.106 | 1.714 | 2.074 | 2.229 | 2.441 |
+| damped Holt | 1.220 | 1.790 | 2.114 | 2.252 | 2.470 |
+| theta | 1.303 | 1.805 | 2.151 | 2.360 | 2.518 |
+| drift | 1.215 | 1.898 | 2.410 | 2.734 | 3.031 |
+| ridge on lags | 1.233 | 1.937 | 2.514 | 2.882 | 3.082 |
+| random forest | 1.290 | 2.064 | 2.594 | 3.006 | 3.336 |
+
+Table A2. Loss differentials against the benchmark by horizon, with the Harvey-Leybourne-Newbold statistic over fifteen origins.
+
+| Horizon | Damped Holt | t | Theta | t | Ridge on lags | t |
 |--:|--:|--:|--:|--:|--:|--:|
-| 1 | 274,365 | 20,859 | 7.6 | 161,901 | 59.0 | 0.07 |
-| 2 | 340,054 | 50,628 | 14.9 | 172,323 | 50.7 | 0.13 |
-| 3 | 355,414 | 48,663 | 13.7 | 193,254 | 54.4 | 0.11 |
-| 4 | 403,400 | 104,632 | 25.9 | 168,181 | 41.7 | 0.42 |
-| 5 | 426,485 | 127,569 | 29.9 | 164,885 | 38.7 | 0.58 |
-
-The table is the honest answer to the sample size objection. With fifteen origins the design can detect a gain of about 162,000 to 193,000 vehicles, which is 39 to 59 percent of the naive error. The observed gain is 21,000 to 128,000 vehicles, 8 to 30 percent. The power at the observed effect runs from 0.07 at one year to 0.58 at five. A null result at one to three years therefore says very little: a gain of 40 percent would have been needed to reject, and no plausible model delivers 40 percent against a random walk on this series. The rejection at five years is at the edge of detectability, which is why the bootstrap in Table 4 matters.
-
-The same arithmetic explains the multiplicity result. The only candidate that separates from the benchmark under the clustered stepdown is Holt, and it separates because its deterioration is larger than the improvement of the winner. Low power is not symmetric: it hides small gains and reveals large losses.
-
-### 7.5 The pooled statistic and the variance
-
-The pooled statistic in the metrics file is minus 2.802 with a p value of 0.0051. It is computed on the 75 stacked errors with the long-run variance truncated at zero lags, because the scoring function calls the test with the default horizon of one. That construction treats five overlapping errors per origin as independent draws and ignores the correlation between adjacent origins. It is the number the pre-registered protocol produced, and it is not a valid test at the pooled level.
-
-Four replacements are reported in Table 6. The first treats the fifteen horizon differentials as independent and refers the mean to a t distribution with fourteen degrees of freedom; it is the most conservative of the asymptotic versions and gives p 0.082 at four years and 0.035 at five. The second is the pre-specified Bartlett and Harvey, Leybourne and Newbold statistic, with p 0.011 and 0.009. The third resamples origins and re-estimates the variance, with p 0.220 and 0.323. The fourth clusters the five horizons within each origin and tests the pooled mean across fifteen origins: the mean differential is minus 70,470 vehicles, the statistic is minus 1.427 and the p value is 0.175. That is the correct pooled test for this design, and it does not reject.
-
-Table 6. The same comparison under four variance estimators, German series.
-
-| Horizon | t, independent | p | DM corrected | p | Bootstrap p | Variance ratio |
-|--:|--:|--:|--:|--:|--:|--:|
-| 1 | -0.388 | 0.7037 | -0.388 | 0.7037 | 0.7244 | 0.93 |
-| 2 | -0.885 | 0.3910 | -0.929 | 0.3685 | 0.5200 | 0.73 |
-| 3 | -0.759 | 0.4606 | -0.857 | 0.4061 | 0.5102 | 0.54 |
-| 4 | -1.874 | 0.0819 | -2.911 | 0.0114 | 0.2196 | 0.24 |
-| 5 | -2.331 | 0.0352 | -3.009 | 0.0094 | 0.3232 | 0.29 |
-
-Note: the fourth estimator pools the five horizons within each origin and clusters by origin. The mean differential is minus 70,470 vehicles, the statistic is minus 1.427 with fourteen degrees of freedom, and the p value is 0.175.
-
-A moving block bootstrap with blocks of two adjacent origins, which preserves the dependence between neighbouring origins, gives p 0.385 at four years and 0.488 at five. The weaker the dependence assumption, the weaker the evidence, and the range runs from 0.009 to 0.488. The columns do not agree, and the disagreement is the result. A paper that reported only the third column would claim significance at four and five years. A paper that reported only the first or the fourth would claim none. The honest statement is that the point estimate is stable and the inference is not: the winner is better at every horizon by a margin that grows with the horizon, and whether that margin is distinguishable from zero depends on an assumption about the variance that fifteen observations cannot settle.
-
-### 7.6 What the checks do not cover
-
-The deletion holds the forecasts fixed, so it measures the influence of a year on the average, not the uncertainty of a model estimated without it. A refitted deletion would be the correct version and is not run, because the archived backtest stores forecasts and not fitted objects. The alternative losses use the same errors, so they test the criterion and not the data. The multiplicity correction assumes that the candidate set is the family, and a reader who believes that other models should have been included is testing a different family. These limits are stated because a robustness section that claims to cover everything covers nothing. The power calculation has a limit of its own: it takes the observed standard deviation as the population value, and that standard deviation is estimated from fifteen observations. A wider true dispersion would lower the power further, a narrower one would raise it, and the table should be read as an order of magnitude rather than as a calibrated statement.
-
-## 8 Discussion
-
-The result that matters is not that ridge regression wins. It is that a rule fixed in advance, applied to a short annual series, produces a winner whose advantage is concentrated at the horizon the projection uses, a benchmark that is not beaten on a second series, and an interval that is wide enough to change a decision. A paper that reported only the first of those would be a paper about a model. The four together are a paper about a method.
-
-Three limitations bound the claim. The sample is 35 annual observations from one country, and the evaluation period contains three structural breaks, so the winner is the best model for a period that includes the breaks rather than the best model for any period. The comparison is univariate, and a multivariate model with leading indicators could beat every candidate in the set; the protocol does not claim otherwise, it claims that within the set the ranking is fixed and reproducible. The interval is pooled across horizons, calibrated on five-step errors and applied to a fifteen-step projection, which makes it too narrow at the long end. The dissertation reports a horizon-specific calibration as an extension and treats the interval in this paper as a lower bound on the uncertainty.
-
-A fourth limitation is the one this section has been circling. The sample supports a point estimate and not a verdict. The protocol was designed for a series that grows by one observation a year, and fifteen origins is what thirty-five years of annual data can supply at a five-year horizon. The remedy is not a different test on the same fifteen numbers; it is more origins, a quarterly series, or a panel of markets that share the protocol. The paper reports the effect size, the interval and the range of p values so that a reader who has those data can rerun the rule and see whether the conclusion travels.
-
-The external validity of the Chinese null is similarly bounded. The series is one firm's deliveries in one market, and the null says that the series behaves like a random walk over the evaluation window, not that Chinese demand is unpredictable in principle. A different window, a different firm or a different frequency could produce a different result, and the protocol would report it.
-
-## 9 Conclusion
-
-The paper fixes a forecast comparison before the results are known, proves the split in Lean 4, and reports what the comparison produces on two series. On German passenger car registrations, ridge regression on three lagged growth rates beats the naive benchmark by 19.5 percent in average scaled error, the advantage is concentrated at horizons four and five, and the projection to 2040 is 3,161,958.51 vehicles with a 95 percent interval from 2,563,157.85 to 3,689,022.75. On Volkswagen Group deliveries in China, no candidate beats the random walk, and the null is published unchanged.
-
-The statistical verdict is narrower than the point estimate. The pre-specified test rejects at four and five years, the bootstrap and the family-wise corrections do not, and the paper leaves the question open rather than closing it in its own favour. What it does close is the accounting: the candidate set, the split, the loss and the rule are fixed, the split is proved, and every number in the tables can be recomputed from the archived files.
-
-The contribution is the protocol, not the number. A reader who disagrees with the candidate set can add a model and rerun the rule. A reader who disagrees with the loss can recompute the ranking, and section 7 reports what happens. A reader who doubts the split can read the Lean module, which is nine theorems and no dependencies. That is the standard the paper sets for itself, and it is the standard against which the other eleven papers in the programme are written.
-
-## Data availability
-
-The German series is Destatis GENESIS table 46131, downloaded on 24 November 2026 and stored in `thesis/data/raw/destatis_pkw_neuzulassungen_jahre.csv`, SHA256 47f9609c55769afd926c356501161afa8bcdee61b073567955826e9cd1235c37. The Chinese series is stored in `thesis/data/raw/vw_group_china_deliveries.csv`. The backtest output, the metrics file and the Diebold and Mariano matrix are in `thesis/data/model/`; the metrics file used in Table 3 has SHA256 3e408618afedf7357dab24573527e955250a98d76b6aad5c8c96c26ab6457362. All series are public and none is edited in place. The frozen release of the data, the code and the results is deposited at Zenodo under DOI 10.5281/zenodo.24516636, which resolves to the latest version.
-
-## Code availability
-
-The protocol, the thirteen candidates, the rolling-origin loop and the interval are implemented in Python in `thesis/analysis/`. The Lean 4 module is `lean_poc/Protocol.lean`, with a checking harness in `lean_poc/Check.lean`, built with Lean 4.36.0 and no Mathlib. The repository is public at github.com/kajevic44-sudo/forecast2040-protocol, archived at Zenodo under DOI 10.5281/zenodo.24516636, with one commit per unit and a README that reproduces Tables 2 and 3 with one command.
-
-## Declaration of generative AI and AI-assisted technologies in the writing process
-
-During the preparation of this manuscript, the author used AI-assisted tools for language editing, for improving English phrasing and linguistic clarity, and for limited technical assistance in reviewing and supporting the preparation of the analytical code. These tools supported the efficiency of the research workflow and did not replace the author's independent scientific work. The research objectives, the methodology, the analytical framework, the interpretation of the data and the scientific conclusions were determined and critically reviewed by the author. The author independently evaluated the analytical outputs, verified every reported result against the underlying data, and takes full responsibility for the accuracy, originality and integrity of the manuscript and its findings.
+| 1 | 0.101 | 2.70 | 0.224 | 3.71 | 0.063 | 1.61 |
+| 2 | 0.083 | 1.59 | 0.108 | 1.31 | 0.169 | 1.62 |
+| 3 | 0.088 | 1.14 | 0.155 | 1.64 | 0.378 | 2.75 |
+| 4 | 0.086 | 0.92 | 0.204 | 1.83 | 0.573 | 3.11 |
+| 5 | 0.096 | 0.97 | 0.176 | 1.49 | 0.632 | 3.09 |
 
 ## References
 
-Armstrong, J. Scott. 2001. *Principles of Forecasting: A Handbook for Researchers and Practitioners*. Boston: Kluwer Academic Publishers.
-
-Baker, Monya. 2016. "1,500 scientists lift the lid on reproducibility." *Nature* 533 (7604): 452-454. https://doi.org/10.1038/533452a
+Assimakopoulos, Vassilis, and Konstantinos Nikolopoulos. 2000. "The theta model: a decomposition approach to forecasting." *International Journal of Forecasting* 16 (4): 521-530. https://doi.org/10.1016/S0169-2070(00)00066-2
 
 Bergmeir, Christoph, and José M. Benítez. 2012. "On the use of cross-validation for time series predictor evaluation." *Information Sciences* 191: 192-213. https://doi.org/10.1016/j.ins.2011.12.028
 
@@ -432,7 +543,9 @@ Bergmeir, Christoph, Rob J. Hyndman, and Bonsoo Koo. 2018. "A note on the validi
 
 Breiman, Leo. 2001. "Random Forests." *Machine Learning* 45 (1): 5-32. https://doi.org/10.1023/A:1010933404324
 
-Cerqueira, Vitor, Luis Torgo, and Igor Mozetič. 2020. "Evaluating time series forecasting models: an empirical study on performance estimation methods." *Machine Learning* 109 (11): 1997-2028. https://doi.org/10.1007/s10994-020-05910-7
+Cameron, A. Colin, Jonah B. Gelbach, and Douglas L. Miller. 2011. "Robust Inference with Multiway Clustering." *Journal of Business & Economic Statistics* 29 (2): 238-249. https://doi.org/10.1198/jbes.2010.07136
+
+Cerqueira, Vitor, Luís Torgo, and Igor Mozetič. 2020. "Evaluating time series forecasting models: an empirical study on performance estimation methods." *Machine Learning* 109 (11): 1997-2028. https://doi.org/10.1007/s10994-020-05910-7
 
 China Association of Automobile Manufacturers. 2025. *Annual Production and Sales Data*. Accessed 24 November 2026. http://www.caam.org.cn.
 
@@ -440,17 +553,15 @@ Christensen, Garret, and Edward Miguel. 2018. "Transparency, Reproducibility, an
 
 Clark, Todd E., and Kenneth D. West. 2007. "Approximately normal tests for equal predictive accuracy in nested models." *Journal of Econometrics* 138 (1): 291-311. https://doi.org/10.1016/j.jeconom.2006.05.023
 
-Community, The mathlib. 2020. "The lean mathematical library." *Proceedings of the 9th ACM SIGPLAN International Conference on Certified Programs and Proofs*: 367-381. https://doi.org/10.1145/3372885.3373824
+de Moura, Leonardo, and Sebastian Ullrich. 2021. "The Lean 4 Theorem Prover and Programming Language." *Lecture Notes in Computer Science*: 625-635. https://doi.org/10.1007/978-3-030-79876-5_37
 
 Diebold, Francis X., and Roberto S. Mariano. 1995. "Comparing Predictive Accuracy." *Journal of Business & Economic Statistics* 13 (3): 253-263. https://doi.org/10.1080/07350015.1995.10524599
 
-Efron, Bradley, and Robert J. Tibshirani. 1993. *An Introduction to the Bootstrap*. New York: Chapman and Hall.
-
 European Automobile Manufacturers Association. 2025. *Motor Vehicle Registrations in the EU by Country and Vehicle Type*. Accessed 24 November 2026. https://www.acea.auto.
 
-Friedman, Jerome H.. 2001. "Greedy function approximation: A gradient boosting machine." *The Annals of Statistics* 29 (5): 1189-1232. https://doi.org/10.1214/aos/1013203451
+Friedman, Jerome H. 2001. "Greedy function approximation: A gradient boosting machine." *The Annals of Statistics* 29 (5): 1189-1232. https://doi.org/10.1214/aos/1013203451
 
-Gardner, Everette S., and Ed. Mckenzie. 1985. "Forecasting Trends in Time Series." *Management Science* 31 (10): 1237-1246. https://doi.org/10.1287/mnsc.31.10.1237
+Gardner, Everette S., and Ed McKenzie. 1985. "Forecasting Trends in Time Series." *Management Science* 31 (10): 1237-1246. https://doi.org/10.1287/mnsc.31.10.1237
 
 Gelman, Andrew, and Eric Loken. 2014. "The Statistical Crisis in Science." *American Scientist* 102 (6): 460. https://doi.org/10.1511/2014.111.460
 
@@ -458,15 +569,19 @@ Giacomini, Raffaella, and Halbert White. 2006. "Tests of Conditional Predictive 
 
 Gneiting, Tilmann, and Matthias Katzfuss. 2014. "Probabilistic Forecasting." *Annual Review of Statistics and Its Application* 1 (1): 125-151. https://doi.org/10.1146/annurev-statistics-062713-085831
 
+Hansen, Peter Reinhard, Asger Lunde, and James M. Nason. 2011. "The Model Confidence Set." *Econometrica* 79 (2): 453-497. https://doi.org/10.3982/ECTA5771
+
 Harvey, Andrew C., Stephen J. Leybourne, and Paul Newbold. 1997. "Testing the Equality of Prediction Mean Squared Errors." *International Journal of Forecasting* 13 (2): 281-291. https://doi.org/10.1016/S0169-2070(96)00719-4
 
 Hoerl, Arthur E., and Robert W. Kennard. 1970. "Ridge Regression: Biased Estimation for Nonorthogonal Problems." *Technometrics* 12 (1): 55-67. https://doi.org/10.1080/00401706.1970.10488634
 
 Hyndman, Rob J., and Anne B. Koehler. 2006. "Another look at measures of forecast accuracy." *International Journal of Forecasting* 22 (4): 679-688. https://doi.org/10.1016/j.ijforecast.2006.03.001
 
-Hyndman, Rob J., and George Athanasopoulos. 2021. *Forecasting: Principles and Practice*. 3rd ed. Melbourne: OTexts.
+Hyndman, Rob J., Anne B. Koehler, J. Keith Snyder, and Simone Grose. 2002. "A state space framework for automatic forecasting using exponential smoothing methods." *International Journal of Forecasting* 18 (3): 439-454. https://doi.org/10.1016/S0169-2070(01)00110-8
 
 International Energy Agency. 2025. *Global EV Outlook 2025*. Paris: IEA. https://www.iea.org/reports/global-ev-outlook-2025.
+
+Internet Engineering Task Force. 2001. "Internet X.509 Public Key Infrastructure Time-Stamp Protocol (TSP)." RFC 3161. https://doi.org/10.17487/RFC3161.
 
 Klier, Thomas H., and James Rubenstein. 2008. *Who Really Made Your Car? Restructuring and Geographic Change in the Auto Industry*. Kalamazoo: W.E. Upjohn Institute.
 
@@ -476,28 +591,24 @@ Makridakis, Spyros, and Michèle Hibon. 2000. "The M3-Competition: results, conc
 
 Makridakis, Spyros, Evangelos Spiliotis, and Vassilios Assimakopoulos. 2020. "The M4 Competition: 100,000 time series and 61 forecasting methods." *International Journal of Forecasting* 36 (1): 54-74. https://doi.org/10.1016/j.ijforecast.2019.04.014
 
-Meese, Richard A., and Kenneth Rogoff. 1983. "Empirical Exchange Rate Models of the Seventies: Do They Fit Out of Sample?" *Journal of International Economics* 14 (1-2): 3-24.
+mathlib Community. 2020. "The Lean mathematical library." *Proceedings of the 9th ACM SIGPLAN International Conference on Certified Programs and Proofs*: 367-381. https://doi.org/10.1145/3372885.3373824
 
-Moura, Leonardo de, and Sebastian Ullrich. 2021. "The Lean 4 Theorem Prover and Programming Language." *Lecture Notes in Computer Science*: 625-635. https://doi.org/10.1007/978-3-030-79876-5_37
-
-Munafò, Marcus R., Brian A. Nosek, Dorothy V. M. Bishop, Katherine S. Button, Christopher D. Chambers, Nathalie Percie du Sert, Uri Simonsohn, Eric-Jan Wagenmakers, Jennifer J. Ware, and John P. A. Ioannidis. 2017. "A manifesto for reproducible science." *Nature Human Behaviour* 1 (1): . https://doi.org/10.1038/s41562-016-0021
+Munafò, Marcus R., Brian A. Nosek, Dorothy V. M. Bishop, Katherine S. Button, Christopher D. Chambers, Nathalie Percie du Sert, Uri Simonsohn, Eric-Jan Wagenmakers, Jennifer J. Ware, and John P. A. Ioannidis. 2017. "A manifesto for reproducible science." *Nature Human Behaviour* 1 (1): 0021. https://doi.org/10.1038/s41562-016-0021
 
 Nosek, Brian A., Charles R. Ebersole, Alexander C. DeHaven, and David T. Mellor. 2018. "The preregistration revolution." *Proceedings of the National Academy of Sciences* 115 (11): 2600-2606. https://doi.org/10.1073/pnas.1708274114
 
-Peng, Roger D.. 2011. "Reproducible Research in Computational Science." *Science* 334 (6060): 1226-1227. https://doi.org/10.1126/science.1213847
-
-Romano, Joseph P., and Michael Wolf. 2005. "Exact and Approximate Stepdown Methods for Multiple Hypothesis Testing." *Journal of the American Statistical Association* 100 (469): 94-108. https://doi.org/10.1198/016214504000000539.
+Peng, Roger D. 2011. "Reproducible Research in Computational Science." *Science* 334 (6060): 1226-1227. https://doi.org/10.1126/science.1213847
 
 Simmons, Joseph P., Leif D. Nelson, and Uri Simonsohn. 2011. "False-Positive Psychology." *Psychological Science* 22 (11): 1359-1366. https://doi.org/10.1177/0956797611417632
 
 Statistisches Bundesamt (Destatis). 2026. *GENESIS-Online, table 46131: Passenger Car Registrations*. Accessed 24 November 2026. https://www-genesis.destatis.de.
 
-Sturgeon, T., J. Van Biesebroeck, and G. Gereffi. 2008. "Value chains, networks and clusters: reframing the global automotive industry." *Journal of Economic Geography* 8 (3): 297-321. https://doi.org/10.1093/jeg/lbn007
+Sturgeon, Timothy J., Johannes Van Biesebroeck, and Gary Gereffi. 2008. "Value chains, networks and clusters: reframing the global automotive industry." *Journal of Economic Geography* 8 (3): 297-321. https://doi.org/10.1093/jeg/lbn007
 
-Tashman, Leonard J.. 2000. "Out-of-sample tests of forecasting accuracy: an analysis and review." *International Journal of Forecasting* 16 (4): 437-450. https://doi.org/10.1016/S0169-2070(00)00065-0
+Tashman, Leonard J. 2000. "Out-of-sample tests of forecasting accuracy: an analysis and review." *International Journal of Forecasting* 16 (4): 437-450. https://doi.org/10.1016/S0169-2070(00)00065-0
 
-Tetlock, Philip E. 2005. *Expert Political Judgment: How Good Is It? How Can We Know?* Princeton: Princeton University Press.
-
-Timmermann, Allan. 2006. "Chapter 4 Forecast Combinations." *Handbook of Economic Forecasting*: 135-196. https://doi.org/10.1016/S1574-0706(05)01004-9
+Tibshirani, Robert. 1996. "Regression Shrinkage and Selection via the Lasso." *Journal of the Royal Statistical Society: Series B* 58 (1): 267-288. https://doi.org/10.1111/j.2517-6161.1996.tb02080.x
 
 Volkswagen AG. 2025. *Annual Report 2025*. Wolfsburg: Volkswagen AG.
+
+Vovk, Vladimir, Alex Gammerman, and Glenn Shafer. 2005. *Algorithmic Learning in a Random World*. New York: Springer.

@@ -1,0 +1,24 @@
+[
+  {
+    "scenario": "null",
+    "mu": 0.0,
+    "reps": 4000,
+    "size_iid": 0.6815,
+    "size_cluster": 0.304,
+    "size_twoway": 0.04825,
+    "size_boot": 0.35275,
+    "size_hln5": 0.543,
+    "mean_differential": 0.003348537399425809
+  },
+  {
+    "scenario": "alternative",
+    "mu": -0.1,
+    "reps": 4000,
+    "size_iid": 0.71325,
+    "size_cluster": 0.377,
+    "size_twoway": 0.076,
+    "size_boot": 0.42225,
+    "size_hln5": 0.5725,
+    "mean_differential": -0.09434681947299267
+  }
+]

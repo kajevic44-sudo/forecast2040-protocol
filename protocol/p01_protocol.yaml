@@ -1,0 +1,138 @@
+protocol: P01
+version: 2.0
+status: frozen
+author: Armin Kajevic
+orcid: 0009-0004-1241-8313
+frozen_on: 2026-11-25
+supersedes: version 1.0, single series, German registrations only
+
+purpose: >
+  Compare forecasting models for annual new passenger car registrations on a
+  panel of European markets under a protocol that fixes the sample, the model
+  set, the tuning rules, the loss, the origins, the test statistics and the
+  interval construction before the panel is evaluated.
+
+data:
+  panel:
+    source: Eurostat
+    dataset: road_eqr_carmot
+    title: New passenger cars by type of motor energy and engine size
+    unit: number of new passenger car registrations
+    file: data/panel/p01_registrations_panel.csv
+    raw_file: data/raw/eurostat_road_eqr_carmot.json
+    raw_sha256: 27c1edcd49c013e2babdfc6e8798f212bbd65f316281a3ddf06ec86acfe7e91a
+    retrieved: 2026-11-25
+  german_series:
+    source: Kraftfahrt-Bundesamt, annual new passenger car registrations
+    file: data/raw/destatis_pkw_neuzulassungen_jahre.csv
+    role: case study and forecast origin for 2040
+  china_series:
+    source: Volkswagen Group annual deliveries in China
+    file: data/raw/vw_group_china_deliveries.csv
+    role: held-out series, negative control
+
+sample:
+  window: 1991 to 2024
+  inclusion: at least 25 consecutive annual observations ending in 2024
+  unit_of_analysis: country
+  countries_expected: 17
+  exclusion: aggregates, series with gaps, series shorter than 25 years
+
+models:
+  - id: naive
+    rule: last observed value, no parameters
+  - id: mean
+    rule: training mean, no parameters
+  - id: drift
+    rule: last value plus h times the mean first difference of the training window
+  - id: linear_trend
+    rule: ordinary least squares of level on a time index, extrapolated
+  - id: loglinear_trend
+    rule: ordinary least squares of log level on a time index, exponentiated
+  - id: holt_damped
+    rule: damped Holt, alpha, beta and phi on the grid 0.1 to 0.9 in steps of 0.1, chosen by in-sample one-step squared error inside the training window only
+  - id: ets_aaa
+    rule: exponential smoothing with additive error, additive trend and no season, parameters by maximum likelihood inside the training window
+  - id: arima_110
+    rule: ARIMA(1,1,0) with constant, estimated inside the training window
+  - id: ar2_diff
+    rule: regression of the first difference on two lagged first differences and a constant
+  - id: ridge_lags
+    rule: ridge regression of the first difference on three lagged differences, penalty on the grid 0.01 to 100 by logarithmic steps, chosen by one-step time series cross validation inside the training window
+  - id: lasso_lags
+    rule: lasso regression of the first difference on three lagged differences, penalty on the same grid and the same cross validation
+  - id: random_forest
+    rule: random forest of 300 trees, maximum depth 3, minimum leaf 5, on three lagged differences, fixed seed 20261125, no tuning
+  - id: theta
+    rule: theta method with theta equal to 2, standardised series, drift on the theta line
+
+tuning_rule: >
+  Every tuning decision uses only observations up to the forecast origin. No
+  parameter is selected on the evaluation window. The grid and the cross
+  validation scheme are fixed in this file before the panel is run.
+
+loss:
+  primary: mean absolute scaled error, scale equal to the mean absolute first
+    difference of the training window, computed per country and origin
+  secondary: symmetric mean absolute percentage error and the ratio of mean
+    absolute error to the naive mean absolute error
+  aggregation: each country receives equal weight, each origin equal weight
+    within a country
+
+evaluation:
+  minimum_training_years: 15
+  maximum_horizon: 5
+  window: expanding
+  origins: every year with at least 15 training observations and 5 observed
+    future values
+  point_forecast: conditional mean or median of the fitted model, no truncation
+    at zero
+
+tests:
+  primary: >
+    Two-sided Diebold-Mariano statistic on the pooled loss differential of each
+    model against the naive benchmark, with country-clustered variance and the
+    Harvey-Leybourne-Newbold small sample correction. Holm adjustment over the
+    twelve non-naive models at familywise level 0.05.
+  secondary:
+    - per-horizon Diebold-Mariano with the Harvey-Leybourne-Newbold correction
+    - Giacomini-White conditional test with the lagged loss differential
+    - model confidence set at 90 percent with 10,000 country block bootstrap
+      resamples
+  reported: test statistic, p value, number of countries, number of origins,
+    number of forecast errors, mean loss differential with confidence interval
+
+intervals:
+  method: split conformal by horizon
+  calibration: first 60 percent of origins in each country
+  evaluation: remaining 40 percent of origins
+  coverage_targets: 0.90 and 0.95
+  finite_sample: ceil((n plus 1) times coverage) divided by n
+  extrapolation_beyond_h5: quantile at five years scaled by the square root of
+    h divided by 5, labelled as an assumption and not a guarantee
+  reported: empirical coverage by horizon, mean width by horizon
+
+robustness:
+  - exclude origins in 2009 and 2020 to 2021
+  - rolling 20 year window instead of expanding
+  - log scale evaluation
+  - leave one country out
+  - alternative loss, symmetric mean absolute percentage error
+  - penalty sensitivity for ridge
+
+multiplicity_disclosure: >
+  The single German series was analysed before this protocol. Those results are
+  reported as stage one and are not covered by the timestamp. The panel
+  evaluation in this file is the first run of version 2.0 and is covered by the
+  timestamp token in protocol/p01_protocol.tsr.
+
+software:
+  python: 3.12
+  libraries: numpy, pandas, scipy, statsmodels, scikit-learn, matplotlib
+  random_seeds: 20261125 for every stochastic step
+
+files_written:
+  - data/panel/p01_registrations_panel.csv
+  - data/model/p01_panel_results.csv
+  - data/model/p01_panel_summary.json
+  - data/model/p01_forecast_2040.csv

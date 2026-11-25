@@ -1,0 +1,6 @@
+name = "p01"
+version = "0.1.0"
+defaultTargets = ["ProtocolCausal"]
+
+[[lean_lib]]
+name = "ProtocolCausal"

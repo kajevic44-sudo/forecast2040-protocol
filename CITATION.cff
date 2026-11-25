@@ -1,10 +1,11 @@
 cff-version: 1.2.0
 message: "If you use this protocol or the archived results, cite the repository and the paper."
-title: "Forecast 2040: pre-registered rolling-origin protocol for German passenger car registrations and long-horizon automotive demand"
+title: "Forecast 2040: a time-stamped panel protocol with a machine-checked split for long-horizon car demand"
 abstract: >-
   Code, data and results for a pre-registered rolling-origin forecast comparison of
-  thirteen models on German passenger car registrations, with the information split
-  checked in Lean 4 and a projection to 2040.
+  thirteen models on a panel of seventeen European car markets, with two-way clustered
+  inference, split conformal intervals, a projection to 2040, and the information split
+  and the selection rule checked in Lean 4.
 type: software
 authors:
   - family-names: Kajevic
@@ -12,8 +13,8 @@ authors:
     city: Ingolstadt
     country: DE
     orcid: "https://orcid.org/0009-0004-1241-8313"
-version: 1.0.0
-date-released: 2026-11-24
+version: 2.0.0
+date-released: 2026-11-25
 repository-code: "https://github.com/kajevic44-sudo/forecast2040-protocol"
 doi: "10.5281/zenodo.24516636"
 identifiers:
@@ -21,12 +22,16 @@ identifiers:
     value: "10.5281/zenodo.24516636"
     description: "All versions of the archive at Zenodo"
   - type: doi
-    value: "10.5281/zenodo.24516637"
-    description: "Version 1.0.0"
+    value: "10.5281/zenodo.24516796"
+    description: "Version 1.0.1, the single-market version"
 keywords:
   - forecast evaluation
   - rolling origin
   - pre-registration
+  - RFC 3161
+  - panel data
+  - two-way clustering
+  - conformal prediction
   - MASE
   - Diebold-Mariano
   - Lean 4

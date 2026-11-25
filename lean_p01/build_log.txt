@@ -1,0 +1,56 @@
+Build log for the Lean 4 module ProtocolCausal
+Author: Armin Kajevic
+Project directory: /home/ubuntu/battery_phd/thesis/lean
+
+Toolchain
+=========
+
+lean --version
+Lean (version 4.36.0, aarch64-unknown-linux-gnu, commit 611c117bfaf7b7ae1cfcf246ce6fba31e8f509e9, Release)
+
+lake --version
+Lake version 5.0.0-src+611c117 (Lean version 4.36.0)
+
+lean-toolchain
+leanprover/lean4:v4.36.0
+
+Build
+=====
+
+Commands: lake clean, then lake build
+Exit code: 0
+
+Complete build output (the build is small, so this is also its tail):
+
+✔ [2/4] Built ProtocolCausal (1.9s)
+Build completed successfully (4 jobs).
+
+Axiom check
+===========
+
+Command: lake env lean CheckAxioms.lean
+Exit code: 0
+
+Output:
+
+'ProtocolCausal.forecast_causal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ProtocolCausal.scale_causal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ProtocolCausal.forecast_scale_causal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ProtocolCausal.forecast_append' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ProtocolCausal.scale_append' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ProtocolCausal.argmin_mem' depends on axioms: [propext]
+'ProtocolCausal.argmin_le' depends on axioms: [propext, Quot.sound]
+'ProtocolCausal.argmin_unique' depends on axioms: [propext, Quot.sound]
+'ProtocolCausal.prefix_congr' depends on axioms: [propext]
+'ProtocolCausal.lexLe_refl' does not depend on any axioms
+'ProtocolCausal.lexLe_trans' depends on axioms: [propext, Quot.sound]
+'ProtocolCausal.lexLe_antisymm' depends on axioms: [propext, Quot.sound]
+'ProtocolCausal.lexLe_total' does not depend on any axioms
+'ProtocolCausal.argminStep_spec' depends on axioms: [propext]
+'ProtocolCausal.argminStep_eq_new_or_acc' depends on axioms: [propext]
+'ProtocolCausal.argmin_cons_ne_none' depends on axioms: [propext]
+'ProtocolCausal.argmin_eq_none' depends on axioms: [propext]
+
+No theorem depends on sorryAx. The only axioms that appear are propext,
+Classical.choice and Quot.sound, which are the standard Lean axioms. The source
+file ProtocolCausal.lean contains no sorry and no admit.
