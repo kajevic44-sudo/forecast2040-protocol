@@ -35,6 +35,7 @@ HORIZONS = 5
 SIGMA_COUNTRY = 0.28
 SIGMA_ORIGIN = 0.24
 SIGMA_CELL = 0.73
+SIGMA_PAIR = 0.0
 
 
 def estimate_components(path: str = "data/model/p01_panel_results.csv") -> dict:
@@ -49,6 +50,7 @@ def estimate_components(path: str = "data/model/p01_panel_results.csv") -> dict:
     frame = pd.read_csv(path)
     frame = frame[frame.divergent == 0]
     components = []
+    pair_components = []
     for model in sorted(frame.model.unique()):
         if model == "naive":
             continue
@@ -83,12 +85,28 @@ def estimate_components(path: str = "data/model/p01_panel_results.csv") -> dict:
                 "sd_cell": math.sqrt(s2),
             }
         )
+        pivot = d.pivot_table(index=["country", "origin_year"], columns="horizon", values="res").dropna()
+        if len(pivot) > 30:
+            cov = pivot.cov().to_numpy()
+            off = cov[np.triu_indices(cov.shape[0], 1)]
+            pair_var = max(float(np.mean(off)), 0.0)
+            total_var = float(np.mean(np.diag(cov)))
+            pair_components.append(
+                {
+                    "model": model,
+                    "sd_pair": math.sqrt(pair_var),
+                    "sd_cell_within": math.sqrt(max(total_var - pair_var, 0.0)),
+                }
+            )
     table = pd.DataFrame(components)
+    pairs = pd.DataFrame(pair_components)
     summary = {
         "models": int(len(table)),
         "sd_country": float(table.sd_country.median()),
         "sd_origin": float(table.sd_origin.median()),
         "sd_cell": float(table.sd_cell.median()),
+        "sd_pair": float(pairs.sd_pair.median()),
+        "sd_cell_within": float(pairs.sd_cell_within.median()),
     }
     return summary
 
@@ -96,8 +114,9 @@ def estimate_components(path: str = "data/model/p01_panel_results.csv") -> dict:
 def one_replication(rng: np.random.Generator, mu: float) -> dict:
     country = rng.normal(0, SIGMA_COUNTRY, size=(COUNTRIES, 1, 1))
     origin = rng.normal(0, SIGMA_ORIGIN, size=(1, ORIGINS, 1))
+    pair = rng.normal(0, SIGMA_PAIR, size=(COUNTRIES, ORIGINS, 1)) if SIGMA_PAIR > 0 else 0.0
     cell = rng.normal(0, SIGMA_CELL, size=(COUNTRIES, ORIGINS, HORIZONS))
-    d = mu + country + origin + cell
+    d = mu + country + origin + pair + cell
 
     flat = d.reshape(-1)
     n = flat.size
@@ -154,13 +173,19 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--reps", type=int, default=REPS)
     parser.add_argument("--out", default="data/model/p01_monte_carlo")
+    parser.add_argument("--design", choices=("baseline", "interaction"), default="baseline")
     args = parser.parse_args()
 
-    global SIGMA_COUNTRY, SIGMA_ORIGIN, SIGMA_CELL
+    global SIGMA_COUNTRY, SIGMA_ORIGIN, SIGMA_CELL, SIGMA_PAIR
     comp = estimate_components()
     SIGMA_COUNTRY = comp["sd_country"]
     SIGMA_ORIGIN = comp["sd_origin"]
-    SIGMA_CELL = comp["sd_cell"]
+    if args.design == "interaction":
+        SIGMA_PAIR = comp["sd_pair"]
+        SIGMA_CELL = comp["sd_cell_within"]
+    else:
+        SIGMA_PAIR = 0.0
+        SIGMA_CELL = comp["sd_cell"]
     print("components", {k: round(v, 4) if isinstance(v, float) else v for k, v in comp.items()})
 
     rng = np.random.default_rng(SEED)
@@ -183,7 +208,12 @@ def main() -> None:
         )
     table = pd.DataFrame(rows)
     table.to_csv(f"{args.out}.csv", index=False)
-    payload = {"components": comp, "reps": args.reps, "table": table.to_dict(orient="records")}
+    payload = {
+        "components": comp,
+        "design": args.design,
+        "reps": args.reps,
+        "table": table.to_dict(orient="records"),
+    }
     with open(f"{args.out}.json", "w") as handle:
         json.dump(payload, handle, indent=2)
     print(table.round(4).to_string(index=False))

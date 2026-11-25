@@ -1,0 +1,36 @@
+{
+  "components": {
+    "models": 12,
+    "sd_country": 0.31168465882034824,
+    "sd_origin": 0.3004181989134403,
+    "sd_cell": 0.8289722047613501,
+    "sd_pair": 0.5162958559185518,
+    "sd_cell_within": 0.5961597575523958
+  },
+  "design": "interaction",
+  "reps": 4000,
+  "table": [
+    {
+      "scenario": "null",
+      "mu": 0.0,
+      "reps": 4000,
+      "size_iid": 0.657,
+      "size_cluster": 0.13975,
+      "size_twoway": 0.037,
+      "size_boot": 0.18225,
+      "size_hln5": 0.56275,
+      "mean_differential": 0.0006603793925540522
+    },
+    {
+      "scenario": "alternative",
+      "mu": -0.1,
+      "reps": 4000,
+      "size_iid": 0.77375,
+      "size_cluster": 0.27575,
+      "size_twoway": 0.09775,
+      "size_boot": 0.32425,
+      "size_hln5": 0.67875,
+      "mean_differential": -0.10016714068176025
+    }
+  ]
+}

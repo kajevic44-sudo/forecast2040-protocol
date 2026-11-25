@@ -1,4 +1,10 @@
 # Changelog
+## v1.3.3, 25 November 2026
+- Added a second Monte Carlo design with a country-origin effect estimated from the panel, 0.516 in standard deviation. The two-way test remains conservative at 3.7 percent; the independent and one-way tests remain far above nominal. Both designs are reported in Table 6 and in the abstract.
+- Made the Holm statement symmetric: no candidate is significantly better than the benchmark, and three are significantly worse.
+- Softened the conclusion from "the answer is no" to "no candidate is shown to beat it", and corrected the list of models that are significantly worse.
+- Added the wild cluster bootstrap as a limitation and the differential test as the next step for the Lean link.
+- Rebuilt the manuscript, 42 pages.
 ## v1.3.2, 25 November 2026
 - Added a full Monte Carlo section with Table 6: size and power of the independent, one-way, two-way, bootstrap and HLN tests. The variance components are now estimated from the observed loss differentials rather than assumed, and every number in the abstract and in Section 5 was updated.
 - Fixed a silent fallback in the first-version replication: damped Holt raised an exception in every call and was replaced by drift, which made the two rows of Table 5 identical. The damping parameter is now estimated, the fallback is recorded, and Table 5 was recomputed.
