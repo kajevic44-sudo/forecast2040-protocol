@@ -465,84 +465,87 @@ A8. Figure 1 is rebuilt by `tools/figures_capital.py` from the same two series a
 
 A9. The power calculation in section 7.4 is produced by the function `power_block` in `tools/p10_analysis.py`. It divides 123 pairs by the overlap of five years, applies the Fisher transform with a standard error of one over the square root of the effective count minus three, and evaluates the normal approximation at the two sided five percent level with 80 percent power.
 
+## Declaration of generative AI and AI-assisted technologies in the writing process
+During the preparation of this manuscript, the author used AI-assisted tools for language editing, for improving English phrasing and linguistic clarity, and for limited technical assistance in reviewing and supporting the preparation of the analytical code. These tools supported the efficiency of the research workflow and did not replace the author's independent scientific work. The research objectives, the methodology, the analytical framework, the interpretation of the data and the scientific conclusions were determined and critically reviewed by the author. The author independently evaluated the analytical outputs, verified every reported result against the underlying data, and takes full responsibility for the accuracy, originality and integrity of the manuscript and its findings.
+
 ## References
 
-Acemoglu, Daron, and James A. Robinson. 2012. *Why Nations Fail: The Origins of Power, Prosperity, and Poverty*. New York: Crown Business.
+Acemoglu, Daron, and James A. Robinson. 2012. Why Nations Fail: The Origins of Power, Prosperity, and Poverty. New York: Crown Business.
 
-Ahmadjian, Christina L., and Gregory E. Robbins. 2005. "A Clash of Capitalisms: Foreign Shareholders and Corporate Restructuring in 1990s Japan." *American Sociological Review* 70 (3): 451-471.
+Ahmadjian, Christina L., and Gregory E. Robbins. 2005. "A Clash of Capitalisms: Foreign Shareholders and Corporate Restructuring in 1990s Japan." American Sociological Review 70 (3): 451-471.
 
-Barberis, Nicholas, and Andrei Shleifer. 2003. "Style Investing." *Journal of Financial Economics* 68 (2): 161-199.
+Barberis, Nicholas, and Andrei Shleifer. 2003. "Style Investing." Journal of Financial Economics 68 (2): 161-199.
 
-Bebchuk, Lucian, Alma Cohen, and Allen Ferrell. 2009. "What Matters in Corporate Governance?" *Review of Financial Studies* 22 (2): 783-827.
+Bebchuk, Lucian, Alma Cohen, and Allen Ferrell. 2009. "What Matters in Corporate Governance?" Review of Financial Studies 22 (2): 783-827.
 
-Berle, Adolf A., and Gardiner C. Means. 1932. *The Modern Corporation and Private Property*. New York: Macmillan.
+Berle, Adolf A., and Gardiner C. Means. 1932. The Modern Corporation and Private Property. New York: Macmillan.
 
-Chancellor, Edward. 2016. *Capital Returns: Investing Through the Capital Cycle*. London: Palgrave Macmillan.
+Chancellor, Edward. 2016. Capital Returns: Investing Through the Capital Cycle. London: Palgrave Macmillan.
 
-Cooper, Michael J., Huseyin Gulen, and Michael J. Schill. 2008. "Asset Growth and the Cross Section of Stock Returns." *Journal of Finance* 63 (4): 1609-1651.
+Cooper, Michael J., Huseyin Gulen, and Michael J. Schill. 2008. "Asset Growth and the Cross Section of Stock Returns." Journal of Finance 63 (4): 1609-1651.
 
-Deeg, Richard. 1999. *Finance Capitalism Unveiled: Banks and the German Political Economy*. Ann Arbor: University of Michigan Press.
+Deeg, Richard. 1999. Finance Capitalism Unveiled: Banks and the German Political Economy. Ann Arbor: University of Michigan Press.
 
-Demsetz, Harold, and Kenneth Lehn. 1985. "The Structure of Corporate Ownership: Causes and Consequences." *Journal of Political Economy* 93 (6): 1155-1177.
+Demsetz, Harold, and Kenneth Lehn. 1985. "The Structure of Corporate Ownership: Causes and Consequences." Journal of Political Economy 93 (6): 1155-1177.
 
-Efron, Bradley, and Robert J. Tibshirani. 1993. *An Introduction to the Bootstrap*. New York: Chapman and Hall.
+Efron, Bradley, and Robert J. Tibshirani. 1993. An Introduction to the Bootstrap. New York: Chapman and Hall.
 
-Faccio, Mara, and Larry H. P. Lang. 2002. "The Ultimate Ownership of Western European Corporations." *Journal of Financial Economics* 65 (3): 365-395.
+Faccio, Mara, and Larry H. P. Lang. 2002. "The Ultimate Ownership of Western European Corporations." Journal of Financial Economics 65 (3): 365-395.
 
-Ferreira, Miguel A., and Pedro Matos. 2008. "The Colors of Investors' Money: The Role of Institutional Investors Around the World." *Journal of Financial Economics* 88 (3): 499-533.
+Ferreira, Miguel A., and Pedro Matos. 2008. "The Colors of Investors' Money: The Role of Institutional Investors Around the World." Journal of Financial Economics 88 (3): 499-533.
 
-Fichtner, Jan, Eelke M. Heemskerk, and Javier Garcia-Bernardo. 2017. "Hidden Power of the Big Three? Passive Index Funds, Re-Concentration of Corporate Ownership, and New Financial Risk." *Business and Politics* 19 (2): 298-326.
+Fichtner, Jan, Eelke M. Heemskerk, and Javier Garcia-Bernardo. 2017. "Hidden Power of the Big Three? Passive Index Funds, Re-Concentration of Corporate Ownership, and New Financial Risk." Business and Politics 19 (2): 298-326.
 
-Fohlin, Caroline. 2007. *Finance Capitalism and Germany's Rise to Industrial Power*. Cambridge: Cambridge University Press.
+Fohlin, Caroline. 2007. Finance Capitalism and Germany's Rise to Industrial Power. Cambridge: Cambridge University Press.
 
-Franks, Julian, and Colin Mayer. 2001. "Ownership and Control of German Corporations." *Review of Financial Studies* 14 (4): 943-977.
+Franks, Julian, and Colin Mayer. 2001. "Ownership and Control of German Corporations." Review of Financial Studies 14 (4): 943-977.
 
-Gerschenkron, Alexander. 1962. *Economic Backwardness in Historical Perspective*. Cambridge, MA: Harvard University Press.
+Gerschenkron, Alexander. 1962. Economic Backwardness in Historical Perspective. Cambridge, MA: Harvard University Press.
 
-Gompers, Paul, Joy Ishii, and Andrew Metrick. 2003. "Corporate Governance and Equity Prices." *Quarterly Journal of Economics* 118 (1): 107-155.
+Gompers, Paul, Joy Ishii, and Andrew Metrick. 2003. "Corporate Governance and Equity Prices." Quarterly Journal of Economics 118 (1): 107-155.
 
-Gourevitch, Peter A., and James Shinn. 2005. *Political Power and Corporate Control: The New Global Politics of Corporate Governance*. Princeton: Princeton University Press.
+Gourevitch, Peter A., and James Shinn. 2005. Political Power and Corporate Control: The New Global Politics of Corporate Governance. Princeton: Princeton University Press.
 
-Grossman, Sanford J., and Oliver D. Hart. 1986. "The Costs and Benefits of Ownership: A Theory of Vertical and Lateral Integration." *Journal of Political Economy* 94 (4): 691-719.
+Grossman, Sanford J., and Oliver D. Hart. 1986. "The Costs and Benefits of Ownership: A Theory of Vertical and Lateral Integration." Journal of Political Economy 94 (4): 691-719.
 
-Hansmann, Henry. 1996. *The Ownership of Enterprise*. Cambridge, MA: Harvard University Press.
+Hansmann, Henry. 1996. The Ownership of Enterprise. Cambridge, MA: Harvard University Press.
 
 Herfindahl, Orris C. 1950. "Concentration in the Steel Industry." PhD diss., Columbia University.
 
-Hirschman, Albert O. 1970. *Exit, Voice, and Loyalty: Responses to Decline in Firms, Organizations, and States*. Cambridge, MA: Harvard University Press.
+Hirschman, Albert O. 1970. Exit, Voice, and Loyalty: Responses to Decline in Firms, Organizations, and States. Cambridge, MA: Harvard University Press.
 
-Jensen, Michael C., and William H. Meckling. 1976. "Theory of the Firm: Managerial Behavior, Agency Costs and Ownership Structure." *Journal of Financial Economics* 3 (4): 305-360.
+Jensen, Michael C., and William H. Meckling. 1976. "Theory of the Firm: Managerial Behavior, Agency Costs and Ownership Structure." Journal of Financial Economics 3 (4): 305-360.
 
-Jorda, Oscar, Moritz Schularick, and Alan M. Taylor. 2017. "Macrofinancial History and the New Business Cycle Facts." *NBER Macroeconomics Annual* 31: 213-263.
+Jorda, Oscar, Moritz Schularick, and Alan M. Taylor. 2017. "Macrofinancial History and the New Business Cycle Facts." NBER Macroeconomics Annual 31: 213-263.
 
-Kotter, Jason, and Ugur Lel. 2011. "Friends or Foes? Target Selection Decisions of Sovereign Wealth Funds and Their Consequences." *Journal of Financial Economics* 101 (2): 360-381.
+Kotter, Jason, and Ugur Lel. 2011. "Friends or Foes? Target Selection Decisions of Sovereign Wealth Funds and Their Consequences." Journal of Financial Economics 101 (2): 360-381.
 
-La Porta, Rafael, Florencio Lopez-de-Silanes, and Andrei Shleifer. 1999. "Corporate Ownership Around the World." *Journal of Finance* 54 (2): 471-517.
+La Porta, Rafael, Florencio Lopez-de-Silanes, and Andrei Shleifer. 1999. "Corporate Ownership Around the World." Journal of Finance 54 (2): 471-517.
 
-Laeven, Luc, and Ross Levine. 2008. "Complex Ownership Structures and Corporate Valuations." *Review of Financial Studies* 21 (2): 579-604.
+Laeven, Luc, and Ross Levine. 2008. "Complex Ownership Structures and Corporate Valuations." Review of Financial Studies 21 (2): 579-604.
 
-Morck, Randall, Andrei Shleifer, and Robert W. Vishny. 1988. "Management Ownership and Market Valuation: An Empirical Analysis." *Journal of Financial Economics* 20: 293-315.
+Morck, Randall, Andrei Shleifer, and Robert W. Vishny. 1988. "Management Ownership and Market Valuation: An Empirical Analysis." Journal of Financial Economics 20: 293-315.
 
-Newey, Whitney K., and Kenneth D. West. 1987. "A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix." *Econometrica* 55 (3): 703-708.
+Newey, Whitney K., and Kenneth D. West. 1987. "A Simple, Positive Semi-Definite, Heteroskedasticity and Autocorrelation Consistent Covariance Matrix." Econometrica 55 (3): 703-708.
 
-Nofsinger, John R., and Richard W. Sias. 1999. "Herding and Feedback Trading by Institutional and Individual Investors." *Journal of Finance* 54 (6): 2263-2295.
+Nofsinger, John R., and Richard W. Sias. 1999. "Herding and Feedback Trading by Institutional and Individual Investors." Journal of Finance 54 (6): 2263-2295.
 
-Reinhart, Carmen M., and Kenneth S. Rogoff. 2009. *This Time Is Different: Eight Centuries of Financial Folly*. Princeton: Princeton University Press.
+Reinhart, Carmen M., and Kenneth S. Rogoff. 2009. This Time Is Different: Eight Centuries of Financial Folly. Princeton: Princeton University Press.
 
-Schularick, Moritz, and Alan M. Taylor. 2012. "Credit Booms Gone Bust: Monetary Policy, Leverage Cycles, and Financial Crises, 1870-2008." *American Economic Review* 102 (2): 1029-1061.
+Schularick, Moritz, and Alan M. Taylor. 2012. "Credit Booms Gone Bust: Monetary Policy, Leverage Cycles, and Financial Crises, 1870-2008." American Economic Review 102 (2): 1029-1061.
 
-Shleifer, Andrei, and Robert W. Vishny. 1994. "Politicians and Firms." *Quarterly Journal of Economics* 109 (4): 995-1025.
+Shleifer, Andrei, and Robert W. Vishny. 1994. "Politicians and Firms." Quarterly Journal of Economics 109 (4): 995-1025.
 
-Shleifer, Andrei, and Robert W. Vishny. 1997. "The Limits of Arbitrage." *Journal of Finance* 52 (1): 35-55.
+Shleifer, Andrei, and Robert W. Vishny. 1997. "The Limits of Arbitrage." Journal of Finance 52 (1): 35-55.
 
-Spearman, Charles. 1904. "The Proof and Measurement of Association Between Two Things." *American Journal of Psychology* 15 (1): 72-101.
+Spearman, Charles. 1904. "The Proof and Measurement of Association Between Two Things." American Journal of Psychology 15 (1): 72-101.
 
-Streeck, Wolfgang. 2009. *Re-Forming Capitalism: Institutional Change in the German Political Economy*. Oxford: Oxford University Press.
+Streeck, Wolfgang. 2009. Re-Forming Capitalism: Institutional Change in the German Political Economy. Oxford: Oxford University Press.
 
-Tobin, James. 1969. "A General Equilibrium Approach to Monetary Theory." *Journal of Money, Credit and Banking* 1 (1): 15-29.
+Tobin, James. 1969. "A General Equilibrium Approach to Monetary Theory." Journal of Money, Credit and Banking 1 (1): 15-29.
 
-Villalonga, Belen, and Raphael Amit. 2006. "How Do Family Ownership, Control and Management Affect Firm Value?" *Journal of Financial Economics* 80 (2): 385-417.
+Villalonga, Belen, and Raphael Amit. 2006. "How Do Family Ownership, Control and Management Affect Firm Value?" Journal of Financial Economics 80 (2): 385-417.
 
-Volkswagen AG. 2025. *Annual Report 2025*. Wolfsburg: Volkswagen AG. Accessed 24 November 2026. https://www.volkswagen-group.com.
+Volkswagen AG. 2025. Annual Report 2025. Wolfsburg: Volkswagen AG. Accessed 24 November 2026. https://www.volkswagen-group.com.
 
-Weber, Klaus, Gerald F. Davis, and Michael Lounsbury. 2009. "Policy as Myth and Ceremony? The Global Spread of Stock Exchanges, 1980-2005." *Academy of Management Journal* 52 (6): 1319-1347.
+Weber, Klaus, Gerald F. Davis, and Michael Lounsbury. 2009. "Policy as Myth and Ceremony? The Global Spread of Stock Exchanges, 1980-2005." Academy of Management Journal 52 (6): 1319-1347.
