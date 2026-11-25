@@ -1,5 +1,6 @@
 import ProtocolCausal
 
+#print axioms ProtocolCausal.forecaster_causal
 #print axioms ProtocolCausal.forecast_causal
 #print axioms ProtocolCausal.scale_causal
 #print axioms ProtocolCausal.forecast_scale_causal

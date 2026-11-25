@@ -1,5 +1,13 @@
 # Changelog
 
+## v1.3.1, 25 November 2026
+
+- Added a generic causality theorem to the Lean module: any forecaster that receives only the prefix is causal, whatever its internal form. The module now has eighteen theorems.
+- Added property tests that check the same invariance on the Python runner, and a hash lock with a verification script.
+- Added a continuous integration workflow that builds both Lean modules, runs the tests and verifies the frozen inputs.
+- Added a paragraph on foundation-model forecasters and the contamination audit they require to the limitations.
+- Rebuilt the manuscript, 38 pages.
+
 ## v1.3.0, 25 November 2026
 
 P01 version 2.0, the panel paper.

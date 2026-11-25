@@ -1,0 +1,29 @@
+name: audit
+on: [push, pull_request]
+jobs:
+  lean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install elan
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Kernel-check the P01 module
+        working-directory: lean_p01
+        run: lake build
+      - name: Check axioms
+        working-directory: lean_p01
+        run: lake env lean CheckAxioms.lean
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install numpy pandas scipy scikit-learn statsmodels pytest
+      - name: Property tests
+        run: pytest -q tests
+      - name: Verify frozen inputs
+        run: python tools/verify_hashes.py

@@ -97,6 +97,14 @@ theorem forecast_scale_causal {m : Nat} {xs ys : Series}
     (forecast m xs, scale m xs) = (forecast m ys, scale m ys) := by
   rw [forecast_causal h, scale_causal h]
 
+/-- Any forecaster that receives only the prefix is causal, whatever its internal
+form. This is the general statement of which `forecast_causal` is the instance for
+the mean. -/
+theorem forecaster_causal (f : Series → Nat → Rat) (k : Nat) {m : Nat} {xs ys : Series}
+    (h : ∀ i, i < m → xs.get? i = ys.get? i) :
+    f («prefix» m xs) k = f («prefix» m ys) k := by
+  rw [prefix_congr h]
+
 /-- Appending future observations does not change the forecast, provided the origin
 lies inside the original series. -/
 theorem forecast_append {m : Nat} {xs ys : Series} (h : m ≤ xs.length) :

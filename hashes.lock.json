@@ -1,0 +1,8 @@
+{
+  "protocol/p01_protocol.yaml": "ab84f048607551395a6d23d9e07309228bbfefc7c4cd3e83b326a64e38ed708a",
+  "protocol/p01_protocol.tsr": "73270970fc266416de04ba0a112e673e381e102e5f27b781d54a3f718dbbaf07",
+  "data/panel/p01_registrations_panel.csv": "5c5b9dd2a957f253b38d9de4db99f0c7b3875124d69496891ffa37c44710e1f9",
+  "data/raw/destatis_pkw_neuzulassungen_jahre.csv": "47f9609c55769afd926c356501161afa8bcdee61b073567955826e9cd1235c37",
+  "data/reference/geo/ne_110m_countries.geojson": "6866c877d39cba9c357620878839b336d569f8c662d3cfab4cb1dbe2d39c977f",
+  "lean_p01/ProtocolCausal.lean": "1531be9d1f1bd255840f1a95a7bcf5983fc6b0c3c29dff3b18d961ee0c6d8fef"
+}
