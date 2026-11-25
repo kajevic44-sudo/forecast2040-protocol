@@ -8,7 +8,7 @@ writes every number the paper reports.
 
 Input   data/panel/panel_daily.csv, Volkswagen preference share and peers
         data/raw/p05_benchmarks.csv, DAX, STOXX Europe 600, STOXX Europe 600
-        Automobiles and Parts, downloaded from Yahoo Finance on 25 November 2026
+        Automobiles and Parts (EXV5.DE), downloaded from Yahoo Finance on 25 November 2026
 Output  data/model/p05_events.csv
         data/model/p05_tests.csv
         data/model/p05_robustness.csv
@@ -42,7 +42,7 @@ RED = "#c8553d"
 GREY = "#666666"
 GOLD = "#b08d3f"
 
-SYMBOLS = {"dax": "%5EGDAXI", "stoxx": "%5ESTOXX", "autos": "EXV4.DE"}
+SYMBOLS = {"dax": "%5EGDAXI", "stoxx": "%5ESTOXX", "autos": "EXV5.DE"}
 
 EVENTS = [
     {"id": "E1", "name": "Italdesign", "date": "2025-12-10", "type": "primary"},
@@ -59,6 +59,7 @@ def download_benchmarks() -> pd.DataFrame:
     if BENCH.exists():
         return pd.read_csv(BENCH, parse_dates=["date"])
     frames = []
+    metadata: dict[str, dict[str, str]] = {}
     for name, symbol in SYMBOLS.items():
         url = (
             "https://query1.finance.yahoo.com/v8/finance/chart/"
@@ -68,6 +69,12 @@ def download_benchmarks() -> pd.DataFrame:
         with urllib.request.urlopen(request, timeout=60) as handle:
             payload = json.loads(handle.read().decode())
         result = payload["chart"]["result"][0]
+        meta = result.get("meta", {})
+        long_name = str(meta.get("longName", ""))
+        if name == "autos" and "Automobiles" not in long_name and "Automobile" not in long_name:
+            raise RuntimeError(
+                f"the autos benchmark is {long_name!r}, not an automobiles and parts index"
+            )
         close = result["indicators"]["adjclose"][0]["adjclose"]
         frame = pd.DataFrame(
             {
@@ -76,9 +83,11 @@ def download_benchmarks() -> pd.DataFrame:
             }
         ).dropna()
         frames.append(frame.set_index("date"))
+        metadata[name] = {"symbol": symbol, "long_name": long_name, "currency": meta.get("currency")}
     merged = pd.concat(frames, axis=1).sort_index()
     merged.index.name = "date"
     merged.to_csv(BENCH, float_format="%.6f")
+    (RAW / "p05_benchmarks_metadata.json").write_text(json.dumps(metadata, indent=2), encoding="utf-8")
     return merged.reset_index()
 
 

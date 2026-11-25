@@ -1,4 +1,11 @@
 # Changelog
+## v1.3.8, 25 November 2026
+- Corrected the P05 sector benchmark. The paper used EXV4.DE, which is the iShares STOXX Europe 600 Health Care UCITS ETF (DE), in place of EXV5.DE, the iShares STOXX Europe 600 Automobiles and Parts UCITS ETF (DE). The fund metadata is now stored with the price file and the analysis refuses a benchmark whose name does not contain Automobiles.
+- Recomputed every P05 result. The sector beta is 0.965350, alpha 0.000498, residual standard deviation 0.010959 and R squared 0.631.
+- Corrected event results: three day mean cumulative abnormal return minus 1.596 log points, Patell minus 1.452140, BMP minus 0.843318, one positive reaction of three; five day mean minus 4.607 log points, Patell minus 2.964906, BMP minus 1.321359, zero positive; twenty day mean minus 1.097 log points. The randomisation p value is 0.2045 and the placebo percentile 17.56.
+- Corrected drift: Volkswagen minus 53.43 log points and minus 41.4 percent in simple terms, sector minus 24.47 and minus 21.7 percent, relative drift minus 28.96 log points with a t statistic of minus 1.62 and a Newey and West t of minus 1.64. The drift is not significant at five percent. BMW lost 45.1 percent, Mercedes-Benz 38.4 percent, BYD 36.4 percent and Tesla 22.3 percent over the same period, and Toyota gained 8.0 percent, so Volkswagen was not the worst performer.
+- Rewrote the paper as a case study with a benchmark audit in section 4.2.1. The earlier conclusion, that the market delivered a large negative verdict on the programme, does not survive the correction.
+- Rebuilt P05 as version 2.1: 30 pages and 42 references in the PDF, with the corrected figures and tables. Added the benchmark metadata file and updated the data availability statement to v1.3.8.
 ## v1.3.7, 25 November 2026
 - Corrected P10's cross-reference to the companion forecasting paper: the old single-market interval from 2.56 to 3.69 million is replaced by the version 2.5 conformal corridor from 0.61 to 5.10 million around a point forecast of 2.86 million.
 - Added the companion paper to the P10 reference list and updated the data availability tag to v1.3.7.

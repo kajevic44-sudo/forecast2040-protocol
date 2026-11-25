@@ -1,0 +1,17 @@
+{
+  "dax": {
+    "symbol": "%5EGDAXI",
+    "long_name": "DAX P",
+    "currency": "EUR"
+  },
+  "stoxx": {
+    "symbol": "%5ESTOXX",
+    "long_name": "STXE 600 I",
+    "currency": "EUR"
+  },
+  "autos": {
+    "symbol": "EXV5.DE",
+    "long_name": "iShares STOXX Europe 600 Automobiles & Parts UCITS ETF (DE) EUR dis",
+    "currency": "EUR"
+  }
+}
