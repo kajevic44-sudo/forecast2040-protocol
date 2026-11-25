@@ -12,6 +12,8 @@ This repository holds the code, the data and the results behind two papers by Ar
 
 **P10. Who owns the plant and when they arrived: ownership layers and the capital cycle in German industry, 1870 to 2020.** Ownership is treated as a dated event rather than a structure. The paper builds a register of 63 ownership events between 1937 and 2026, prices the capital cycle on 151 years of German data, and reports both halves of the result. The annual change in bank credit to gross domestic product correlates with the real total equity return five years later at minus 0.303589 over 123 observations, with a slope of minus 1.020070 and a t statistic of minus 3.545150. The relation does not survive the removal of the war years, where the correlation falls to minus 0.095086, and it is absent after 1950, where the correlation is 0.000255 over 65 observations. The capital cycle is a pre-war phenomenon in the German data, and the period in which it disappears is the period in which families and states consolidated control.
 
+**P05. Pricing the sale of engineering subsidiaries: an event study of the Volkswagen divestment programme, 2025 to 2026.** The paper prices four announcements: the sale of a majority of Italdesign to UST, an exclusive arrangement to sell 51 percent of Everllence to Bain Capital for about 7.4 billion euros, the reported transfer of 70 percent of IAV to Accenture, and the divestment programme of 1 September 2026. The design was fixed before any return was computed. The three primary announcements produce a mean cumulative abnormal return over the three day window of minus 3.15 log points, with a Patell statistic of minus 1.77, a Boehmer-Musumeci-Poulsen t of minus 1.43 and one positive reaction out of three. Over the five days after the announcement the mean is minus 5.81 log points and the Patell statistic is minus 2.32. The randomisation test gives a two sided p value of 0.141 and the placebo places the observed mean at the 15.7th percentile, so the announcement effect is negative but not distinguishable from the normal variation of the stock. Between 9 December 2025 and 20 November 2026 the preference share lost 41.4 percent while the sector gained 11.6 percent, a relative drift of minus 64.4 log points with a t statistic of minus 2.18. The paper reports the announcement evidence and the drift separately.
+
 ## Repository layout
 
 ```
@@ -23,6 +25,7 @@ data/historical/tidy/    German macrohistory extract and the drawdown record use
 data/model/              Backtest output, metrics, Diebold-Mariano matrix, P01 and P10 tables
 papers/P01_full.md       Manuscript source, P01
 papers/P10_full.md       Manuscript source, P10
+papers/P05_full.md       Manuscript source, P05
 papers/build/            Rendered manuscripts (PDF, DOCX)
 tools/                   Scripts that build the figures, the tables and the PDFs
 analysis/                Chapter level analysis scripts
@@ -55,12 +58,14 @@ Every number in P10 is produced by one script, which writes the three output tab
 
 ```bash
 python tools/p10_analysis.py
+python tools/p05_analysis.py
 ```
 
 The two figures of P10 are rebuilt with:
 
 ```bash
 python tools/figures_capital.py
+python tools/fig_p10_ownership.py
 python tools/fig_p10_ownership.py
 ```
 
@@ -82,7 +87,7 @@ lake build
 
 The German registration series in P01 is Destatis GENESIS table 46131, downloaded on 24 November 2026. The Chinese series is Volkswagen Group deliveries as reported in the group annual reports. Both are public. The SHA256 of each file is recorded in the paper and in `data/manifest.csv`. No series is edited in place; every transformation is applied at run time.
 
-P10 uses the German block of the JST Macrohistory Database release R6, stored as `data/historical/tidy/jst_germany.csv` with SHA256 9037f8602d88f5fcb1ee62526f50a3acda86f4412101500c51aaa9982575902a, and a drawdown record built from the same source, `data/historical/tidy/de_equity_drawdowns.csv` with SHA256 f55d2fc8b7fa1345a5e08d40ede12a419017fc5a4c3f2b5cd8fc662e073de9e8. The credit ratio is missing for 1870, for 1914 to 1926 and for 1944 to 1949, and the gaps are preserved rather than bridged, because bridging them would turn a five year change into a one year change. The ownership register is `docs/OWNERSHIP.md`.
+P10 uses the German block of the JST Macrohistory Database release R6, stored as `data/historical/tidy/jst_germany.csv` with SHA256 9037f8602d88f5fcb1ee62526f50a3acda86f4412101500c51aaa9982575902a, and a drawdown record built from the same source, `data/historical/tidy/de_equity_drawdowns.csv` with SHA256 f55d2fc8b7fa1345a5e08d40ede12a419017fc5a4c3f2b5cd8fc662e073de9e8. The credit ratio is missing for 1870, for 1914 to 1926 and for 1944 to 1949, and the gaps are preserved rather than bridged, because bridging them would turn a five year change into a one year change. The ownership register is `docs/OWNERSHIP.md`. P05 uses the daily panel in `data/panel/panel_daily.csv` and three benchmark series in `data/raw/p05_benchmarks.csv`, downloaded from Yahoo Finance on 25 November 2026.
 
 ## Results that are archived
 
@@ -94,7 +99,9 @@ P10 uses the German block of the JST Macrohistory Database release R6, stored as
 - `data/model/p10_subsamples.csv`: the four subperiods and the full sample.
 - `data/model/p10_exclusions.csv`: the variants without the war years, without 1923 and after 1950.
 - `data/model/p10_summary.json`: every reported statistic in one file, including the power calculation.
-- `data/model/capital_cycle_lags.csv` and `data/model/p10_concentration_ladder.csv`: the two figures.
+- `data/model/capital_cycle_lags.csv` and `data/model/p10_concentration_ladder.csv`: the two P10 figures.
+- `data/model/p05_events.csv`, `p05_tests.csv`, `p05_robustness.csv`: the event study tables of P05.
+- `data/model/p05_summary.json`: every P05 statistic in one file.
 
 ## Citation
 
