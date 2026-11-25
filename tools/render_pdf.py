@@ -48,6 +48,9 @@ th { background: #E7EDEF; color: #1C2E3A; font-weight: bold; font-size: 8.6pt;
 tbody tr:nth-child(even) td { background: #F6F8F8; }
 img { max-width: 100%; max-height: 172mm; display: block; margin: 10pt auto; }
 p:has(+ table) { page-break-after: avoid; break-after: avoid; }
+table { page-break-inside: avoid; break-inside: avoid; }
+thead { display: table-header-group; }
+tr { page-break-inside: avoid; }
 figure { margin: 12pt 0; page-break-inside: avoid; }
 figcaption, .caption { font-family: "DejaVu Sans", Helvetica, sans-serif; font-size: 8.4pt;
                        color: #5F6E75; text-align: left; margin-top: 4pt; line-height: 1.4; }
@@ -68,6 +71,7 @@ blockquote { margin: 8pt 16pt; padding-left: 8pt; border-left: 1.4pt solid #D5DB
 TEMPLATE = """<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <title>Dissertation</title>
+<base href="{base}/">
 <link rel="stylesheet" href="{katex}/katex.min.css">
 <style>{css}</style>
 </head><body>
@@ -147,7 +151,7 @@ def build_html(source: Path) -> str:
     )
     body = restore_math(body, store)
     body = body.replace("<p>MATHBLOCK", "<p>MATHBLOCK")
-    return TEMPLATE.format(katex=KATEX.as_uri(), css=CSS, body=body)
+    return TEMPLATE.format(katex=KATEX.as_uri(), css=CSS, body=body, base=source.parent.resolve().as_uri())
 
 
 async def render(source: Path, target: Path) -> int:

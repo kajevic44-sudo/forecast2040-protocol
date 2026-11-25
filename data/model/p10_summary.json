@@ -1,0 +1,170 @@
+{
+  "lag_table": [
+    {
+      "horizon": -5,
+      "correlation": 0.00169,
+      "observations": 125,
+      "band_2se": 0.178885
+    },
+    {
+      "horizon": -4,
+      "correlation": 0.021483,
+      "observations": 126,
+      "band_2se": 0.178174
+    },
+    {
+      "horizon": -3,
+      "correlation": 0.021015,
+      "observations": 127,
+      "band_2se": 0.177471
+    },
+    {
+      "horizon": -2,
+      "correlation": -0.057742,
+      "observations": 128,
+      "band_2se": 0.176777
+    },
+    {
+      "horizon": -1,
+      "correlation": -0.101948,
+      "observations": 128,
+      "band_2se": 0.176777
+    },
+    {
+      "horizon": 0,
+      "correlation": -0.005311,
+      "observations": 128,
+      "band_2se": 0.176777
+    },
+    {
+      "horizon": 1,
+      "correlation": 0.03262,
+      "observations": 127,
+      "band_2se": 0.177471
+    },
+    {
+      "horizon": 2,
+      "correlation": -0.029847,
+      "observations": 126,
+      "band_2se": 0.178174
+    },
+    {
+      "horizon": 3,
+      "correlation": -0.103868,
+      "observations": 125,
+      "band_2se": 0.178885
+    },
+    {
+      "horizon": 4,
+      "correlation": -0.066481,
+      "observations": 124,
+      "band_2se": 0.179605
+    },
+    {
+      "horizon": 5,
+      "correlation": -0.303589,
+      "observations": 123,
+      "band_2se": 0.180334
+    }
+  ],
+  "regression_h5": {
+    "slope": -1.0200704066201562,
+    "intercept": 0.10665914999665689,
+    "se_slope": 0.2877368793410022,
+    "t_slope": -3.5451500306683044,
+    "p_slope": 0.0003923896724316034,
+    "r2": 0.09216629718582359,
+    "n": 123,
+    "lags": 5,
+    "correlation": -0.3035890267875695
+  },
+  "power": {
+    "pairs": 123,
+    "overlap": 5,
+    "effective_n": 24.6,
+    "fisher_se": 0.2151657414559676,
+    "mde_80": 0.5390426491511913,
+    "observed": -0.303589,
+    "power_observed": 0.3077654423879751,
+    "power_if_independent": 0.9297469439107178,
+    "power_grid": {
+      "-0.2": 0.1562516922993451,
+      "-0.3": 0.30136656400330153,
+      "-0.4": 0.5036244486761294,
+      "-0.5": 0.7234060204530866,
+      "-0.6": 0.8964344698169172,
+      "-0.7": 0.980815210933306
+    }
+  },
+  "bootstrap_h5": {
+    "point": -0.3035890267875696,
+    "ci_low": -0.4834763048556059,
+    "ci_high": 0.06433009677663792,
+    "share_below_zero": 0.9384,
+    "reps": 5000,
+    "block": 10
+  },
+  "reverse": {
+    "slope": 4.36241594090495e-13,
+    "intercept": 0.018848725806313655,
+    "se_slope": 3.5206268179036445e-12,
+    "t_slope": 0.12391020595311344,
+    "p_slope": 0.9013863720458111,
+    "r2": 2.854872226731864e-06,
+    "n": 125,
+    "lags": 5,
+    "correlation": 0.0016896367144303794
+  },
+  "cumulative": {
+    "slope": -1.6226538337650198,
+    "intercept": 0.6075633671271882,
+    "se_slope": 1.1354879844364212,
+    "t_slope": -1.4290365516905004,
+    "p_slope": 0.15299372803543054,
+    "r2": 0.02221304005268554,
+    "n": 123,
+    "lags": 5,
+    "correlation": -0.14904039738502245
+  },
+  "log_credit": {
+    "slope": -0.16829810981513793,
+    "intercept": 0.09336877477313096,
+    "se_slope": 0.2263527700759285,
+    "t_slope": -0.7435213174492341,
+    "p_slope": 0.4571661201900197,
+    "r2": 0.006606926436950378,
+    "n": 123,
+    "lags": 5,
+    "correlation": -0.08128300214036534
+  },
+  "rolling": {
+    "window": 40,
+    "first_year": 1911,
+    "min": -0.5933116643907581,
+    "max": 0.24674842787558124,
+    "median": -0.2914587614434083,
+    "share_negative": 0.8214285714285714,
+    "n_windows": 84
+  },
+  "drawdowns": {
+    "episodes": 10,
+    "depth_duration_spearman": -0.4526184367741704,
+    "p_value": 0.18901697359902025,
+    "depth_duration_pearson": -0.6224603367117479,
+    "pearson_p": 0.0546088636533502,
+    "deepest": -90.2,
+    "median_recovery": 6.5,
+    "max_recovery": 12.0
+  },
+  "ownership": {
+    "hhi": 0.36239799999999994,
+    "top3": 0.9029999999999999,
+    "effective_number": 2.759397126915712,
+    "votes": {
+      "Porsche SE": 53.3,
+      "Lower Saxony": 20.0,
+      "Qatar Holding": 17.0,
+      "free float": 9.7
+    }
+  }
+}

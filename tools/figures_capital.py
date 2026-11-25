@@ -65,7 +65,10 @@ def style() -> None:
             "axes.spines.top": False,
             "axes.spines.right": False,
             "font.family": "DejaVu Sans",
-            "axes.titlesize": 11,
+            "axes.titlesize": 10.5,
+            "axes.labelsize": 9.5,
+            "xtick.labelsize": 9,
+            "ytick.labelsize": 9,
             "axes.titleweight": "bold",
             "axes.titlelocation": "left",
         }
@@ -77,7 +80,7 @@ def main() -> int:
     frame = load()
     table = lag_table(frame, range(-5, 6))
 
-    fig, (left, right) = plt.subplots(1, 2, figsize=(12, 4.8), gridspec_kw={"width_ratios": [1.3, 1]})
+    fig, (left, right) = plt.subplots(2, 1, figsize=(7.4, 8.4))
 
     colours = [RED if value < 0 else NAVY for value in table["correlation"]]
     left.bar(table["lag_years"], table["correlation"], color=colours, width=0.7)
@@ -87,14 +90,14 @@ def main() -> int:
     left.set_xlabel("years between credit change and equity return")
     left.set_ylabel("correlation")
     left.set_ylim(-0.34, 0.22)
-    left.set_title("Credit growth and later equity returns, Germany 1870 to 2020")
+    left.set_title("Credit growth and later equity returns\nGermany, 1870 to 2020")
     left.set_xticks(list(table["lag_years"]))
     left.text(
         0.02,
         0.04,
         "dotted lines: two standard error band, red bars are negative",
         transform=left.transAxes,
-        fontsize=7.5,
+        fontsize=8.5,
         color=GREY,
     )
     for lag, value in zip(table["lag_years"], table["correlation"], strict=True):
@@ -104,14 +107,14 @@ def main() -> int:
             xytext=(0, 4 if value >= 0 else -12),
             textcoords="offset points",
             ha="center",
-            fontsize=6.5,
+            fontsize=8,
             color="#222222",
         )
 
     horizon = 5
     scatter = pd.concat([frame["credit_change"], frame["equity_return"].shift(-horizon)], axis=1).dropna()
     scatter.columns = ["credit_change", "forward_return"]
-    right.scatter(scatter["credit_change"], scatter["forward_return"], s=14, color=NAVY, alpha=0.65, edgecolor="none")
+    right.scatter(scatter["credit_change"], scatter["forward_return"], s=18, color=NAVY, alpha=0.65, edgecolor="none")
     slope, intercept = np.polyfit(scatter["credit_change"], scatter["forward_return"], 1)
     grid = np.linspace(scatter["credit_change"].min(), scatter["credit_change"].max(), 50)
     right.plot(grid, intercept + slope * grid, color=RED, linewidth=1.6)
@@ -119,15 +122,15 @@ def main() -> int:
     r_squared = 1 - float(((scatter["forward_return"] - fitted) ** 2).sum()) / float(
         ((scatter["forward_return"] - scatter["forward_return"].mean()) ** 2).sum()
     )
-    right.set_xlabel("change in credit to GDP, percentage points")
+    right.set_xlabel("change in the credit to GDP ratio")
     right.set_ylabel("real equity return, next five years")
-    right.set_title("Five year ahead relation")
+    right.set_title("The five year relation")
     right.text(
         0.03,
         0.05,
         f"slope {slope:.3f}, R squared {r_squared:.3f}, n {len(scatter)}",
         transform=right.transAxes,
-        fontsize=8,
+        fontsize=8.5,
         color=GREY,
     )
 
