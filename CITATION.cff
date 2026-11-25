@@ -13,7 +13,7 @@ authors:
     city: Ingolstadt
     country: DE
     orcid: "https://orcid.org/0009-0004-1241-8313"
-version: 2.0.0
+version: 2.5.0
 date-released: 2026-11-25
 repository-code: "https://github.com/kajevic44-sudo/forecast2040-protocol"
 doi: "10.5281/zenodo.24516636"

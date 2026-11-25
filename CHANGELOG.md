@@ -1,4 +1,9 @@
 # Changelog
+## v1.3.5, 25 November 2026
+- Bumped the paper to version 2.5 and qualified the title with "on this panel", so the headline claim is explicitly a statement about the sample.
+- Labelled the second Monte Carlo design, the common-sample ranking and the Germany-only conformal calibration as post hoc in Section 3.9 and where they are reported.
+- Updated CITATION.cff to version 2.5.0.
+- Rebuilt the manuscript, 43 pages.
 ## v1.3.4, 25 November 2026
 - Removed the Kraftfahrt-Bundesamt FZ 28 reference, which pointed to electric powertrains while the paper uses the Destatis total registration series.
 - Added the linear-scaling sensitivity for the 2040 band: the half-width would triple and the lower bound would fall below zero, which is a further argument for the square root rule.
