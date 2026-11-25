@@ -1,4 +1,8 @@
 # Changelog
+## v1.3.6, 25 November 2026
+- Rewrote the P01 cover letter for version 2.5: the new title, the seventeen-country panel, thirteen candidate models, 216 origins and 13,610 errors, the timestamped protocol, the negative result, two-way clustering with the Monte Carlo study, the conformal 2040 corridor and the narrow Lean claim.
+- Removed the single-market description, the nine theorems, the six tables, the missing figures and the Chinese control that no longer match the paper.
+- Added the letter as Markdown and PDF in docs.
 ## v1.3.5, 25 November 2026
 - Bumped the paper to version 2.5 and qualified the title with "on this panel", so the headline claim is explicitly a statement about the sample.
 - Labelled the second Monte Carlo design, the common-sample ranking and the Germany-only conformal calibration as post hoc in Section 3.9 and where they are reported.
