@@ -237,6 +237,16 @@ def main() -> None:
     FIG.mkdir(parents=True, exist_ok=True)
     prices = load_prices()
     returns = log_returns(prices, ["vw", "pah3", "bmw", "mbg", "dax", "stoxx", "autos"])
+    # The extension analysis reads the same return series. Add the three
+    # international peers on the same calendar without dropping any base row.
+    panel = pd.read_csv(PANEL, parse_dates=["period"]).rename(columns={"period": "date"})
+    peer_columns = {"yahoo_toyota": "toyota", "yahoo_byd": "byd", "yahoo_tsla": "tesla"}
+    peers = panel[["date", *peer_columns]].rename(columns=peer_columns)
+    peer_returns = peers.set_index("date").pipe(np.log).diff().reset_index()
+    extras = returns.merge(peer_returns, on="date", how="left").rename(
+        columns={"autos": "sector", "stoxx": "market", "mbg": "mercedes", "pah3": "porsche_se"}
+    )
+    extras.to_csv(OUT / "p05_returns.csv", index=False, float_format="%.10f")
     print(f"returns {returns['date'].min().date()} to {returns['date'].max().date()}, rows {len(returns)}")
 
     first = pd.Timestamp(EVENTS[0]["date"])

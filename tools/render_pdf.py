@@ -47,13 +47,14 @@ th { background: #E7EDEF; color: #1C2E3A; font-weight: bold; font-size: 8.6pt;
      letter-spacing: 0.3pt; border-bottom: 0.9pt solid #1C2E3A; }
 tbody tr:nth-child(even) td { background: #F6F8F8; }
 img { max-width: 100%; max-height: 172mm; display: block; margin: 10pt auto; }
-p:has(+ table) { page-break-after: avoid; break-after: avoid; }
+p:has(+ table) { page-break-after: avoid; break-after: avoid; page-break-inside: avoid; break-inside: avoid; }
 table { page-break-inside: avoid; break-inside: avoid; }
 thead { display: table-header-group; }
 tr { page-break-inside: avoid; }
 figure { margin: 12pt 0; page-break-inside: avoid; }
 figcaption, .caption { font-family: "DejaVu Sans", Helvetica, sans-serif; font-size: 8.4pt;
                        color: #5F6E75; text-align: left; margin-top: 4pt; line-height: 1.4; }
+h2#references ~ p { font-size: 9.6pt; line-height: 1.3; margin-bottom: 3pt; }
 em { color: #35505E; }
 code { font-family: "DejaVu Sans Mono", monospace; font-size: 8.4pt; color: #2A3E48; }
 pre { background: #F4F7F6; border-left: 2.2pt solid #C3955E; padding: 7pt 8pt;
@@ -70,7 +71,7 @@ blockquote { margin: 8pt 16pt; padding-left: 8pt; border-left: 1.4pt solid #D5DB
 
 TEMPLATE = """<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
-<title>Dissertation</title>
+<title>{title}</title>
 <base href="{base}/">
 <link rel="stylesheet" href="{katex}/katex.min.css">
 <style>{css}</style>
@@ -90,7 +91,6 @@ try {{
     throwOnError: true,
     errorCallback: function (msg) {{ document.title = "KATEX ERROR " + msg; }}
   }});
-  document.title = "RENDERED";
 }} catch (e) {{ document.title = "KATEX ERROR " + e.message; }}
 </script>
 </body></html>
@@ -151,7 +151,9 @@ def build_html(source: Path) -> str:
     )
     body = restore_math(body, store)
     body = body.replace("<p>MATHBLOCK", "<p>MATHBLOCK")
-    return TEMPLATE.format(katex=KATEX.as_uri(), css=CSS, body=body, base=source.parent.resolve().as_uri())
+    match = re.search(r"<h1>(.*?)</h1>", body, re.S)
+    title = re.sub(r"<[^>]+>", "", match.group(1)).strip() if match else source.stem
+    return TEMPLATE.format(katex=KATEX.as_uri(), css=CSS, body=body, base=source.parent.resolve().as_uri(), title=html.escape(title))
 
 
 async def render(source: Path, target: Path) -> int:

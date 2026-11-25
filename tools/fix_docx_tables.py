@@ -94,10 +94,16 @@ def normalise(path: Path) -> None:
                 grid_col.set(qn("w:w"), str(width))
 
         for row_index, row in enumerate(table.rows):
+            tr_pr = row._tr.get_or_add_trPr()
+            set_child(tr_pr, "w:cantSplit")
+            if row_index == 0:
+                set_child(tr_pr, "w:tblHeader")
             for cell, width in zip(row.cells, widths):
                 tc_pr = cell._tc.get_or_add_tcPr()
                 set_child(tc_pr, "w:tcW", type="dxa", w=str(width))
                 for paragraph in cell.paragraphs:
+                    if row_index < len(table.rows) - 1:
+                        paragraph.paragraph_format.keep_with_next = True
                     for run in paragraph.runs:
                         run.font.size = Pt(font_points)
                         if row_index == 0:

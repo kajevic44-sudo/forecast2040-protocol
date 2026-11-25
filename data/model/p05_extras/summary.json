@@ -1,0 +1,64 @@
+{
+  "base_mean_car": -0.01595627349577246,
+  "base_patell_z": -1.4521400423377055,
+  "base_bmp_t": -0.8433181853219872,
+  "residual_sd_daily": 0.010958771869520123,
+  "mde_three_events_three_day": 0.06195529913503504,
+  "specifications": 128,
+  "share_negative": 1.0,
+  "share_significant_negative_bmp": 0.0,
+  "curve_min": -0.12904596327399076,
+  "curve_max": -0.0063717804346428205,
+  "peer_placebo": {
+    "Italdesign": {
+      "firm_car": 0.019626,
+      "peer_mean_car": 0.00538,
+      "peer_min_car": -0.004903,
+      "peer_max_car": 0.014552,
+      "firm_minus_peers": 0.014246,
+      "firm_rank_among_four": 4
+    },
+    "Everllence": {
+      "firm_car": -0.044942,
+      "peer_mean_car": -0.005265,
+      "peer_min_car": -0.013374,
+      "peer_max_car": 0.00724,
+      "firm_minus_peers": -0.039677,
+      "firm_rank_among_four": 1
+    },
+    "IAV": {
+      "firm_car": -0.022553,
+      "peer_mean_car": -0.0105,
+      "peer_min_car": -0.024809,
+      "peer_max_car": 0.002287,
+      "firm_minus_peers": -0.012053,
+      "firm_rank_among_four": 2
+    }
+  },
+  "bayes": [
+    {
+      "prior_sd": 0.01,
+      "post_mean": -0.004357,
+      "post_sd": 0.008709,
+      "ci95_lo": -0.021081,
+      "ci95_hi": 0.013234,
+      "p_negative": 0.69825
+    },
+    {
+      "prior_sd": 0.03,
+      "post_mean": -0.011752,
+      "post_sd": 0.015662,
+      "ci95_lo": -0.041895,
+      "ci95_hi": 0.021018,
+      "p_negative": 0.793283
+    },
+    {
+      "prior_sd": 0.1,
+      "post_mean": -0.015444,
+      "post_sd": 0.01951,
+      "ci95_lo": -0.054779,
+      "ci95_hi": 0.024348,
+      "p_negative": 0.818217
+    }
+  ]
+}
