@@ -2,7 +2,7 @@
 
 ## v1.3.15, 27 November 2026
 
-P05 version 2.5, reference list correction. The entries for Good (2005) and Gorton and Schmid (2000) are placed in alphabetical order. No result, table, figure or data file changes.
+P05 version 2.5, reference list correction. The entries for Good (2005) and Gorton and Schmid (2000) are placed in alphabetical order, and the data availability statement no longer names a release tag, so it stays correct for every later version. No result, table, figure or data file changes.
 
 ## v1.3.14, 27 November 2026
 
