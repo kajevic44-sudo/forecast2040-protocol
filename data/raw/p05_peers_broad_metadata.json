@@ -1,0 +1,32 @@
+{
+  "source": "Yahoo Finance via yfinance",
+  "download_date": "2026-11-26",
+  "start": "2016-11-24",
+  "end": "2026-11-20",
+  "tickers": {
+    "STLAP.PA": "Stellantis",
+    "RNO.PA": "Renault",
+    "RACE.MI": "Ferrari",
+    "DTG.DE": "Daimler Truck",
+    "IVG.MI": "Iveco",
+    "VOLV-B.ST": "Volvo Group",
+    "CON.DE": "Continental",
+    "FRVIA.PA": "Forvia",
+    "FR.PA": "Valeo",
+    "ML.PA": "Michelin",
+    "BRE.MI": "Brembo",
+    "PIRC.MI": "Pirelli",
+    "NOEJ.DE": "Norma Group",
+    "ZIL2.DE": "ElringKlinger",
+    "GRM.DE": "Grammer",
+    "BDT.DE": "Bertrandt",
+    "ED4.DE": "EDAG",
+    "ATE.PA": "Alten",
+    "OPM.PA": "OPmobility",
+    "AML.L": "Aston Martin",
+    "SGL.DE": "SGL Carbon"
+  },
+  "rows": 2563,
+  "sha256_prices": "aeaeeb135734edd4d355ec9f3351756ecbf47248a03f89d358aa6eee845768a3",
+  "note": "Adjusted closes. The raw file is not redistributed. The metadata records the exact download and its hash."
+}

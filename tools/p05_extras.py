@@ -281,8 +281,8 @@ def bayes_mean(cars: np.ndarray, sds: np.ndarray, prior_sd: float,
 
 
 def plot_curve(curve: pd.DataFrame, path: Path) -> None:
-    fig, (top, bottom) = plt.subplots(
-        2, 1, figsize=(9, 7), sharex=True, gridspec_kw={"height_ratios": [3, 2]}
+    fig, (top, middle, bottom) = plt.subplots(
+        3, 1, figsize=(9, 9), sharex=True, gridspec_kw={"height_ratios": [3, 2, 2]}
     )
     x = np.arange(len(curve))
     colors = np.where(curve.timing == "announcement", NAVY, RED)
@@ -294,15 +294,43 @@ def plot_curve(curve: pd.DataFrame, path: Path) -> None:
                     edgecolors=GOLD, linewidths=1.8, label="base specification")
         top.legend(frameon=False, loc="upper left")
     top.set_ylabel("mean CAR, log points")
-    top.set_title("Specification curve: sign is stable, significance is not")
-    bottom.scatter(x, curve.patell_z, s=14, c=colors, alpha=0.8, label="Patell z")
-    bottom.scatter(x, curve.bmp_t, s=14, c=colors, alpha=0.5, marker="x", label="BMP t")
-    bottom.axhline(0, color=GREY, lw=0.8)
-    bottom.axhline(-1.96, color=GREY, lw=0.8, ls="--")
-    bottom.axhline(-4.303, color=GREY, lw=0.8, ls=":")
-    bottom.set_ylabel("test statistic")
+    top.set_title("Specification curve: sign is stable, significance is fragile")
+    middle.scatter(x, curve.patell_z, s=14, c=colors, alpha=0.8, label="Patell z")
+    middle.scatter(x, curve.bmp_t, s=14, c=colors, alpha=0.5, marker="x", label="BMP t")
+    middle.axhline(0, color=GREY, lw=0.8)
+    middle.axhline(-1.96, color=GREY, lw=0.8, ls="--")
+    middle.axhline(-4.303, color=GREY, lw=0.8, ls=":")
+    middle.set_ylabel("test statistic")
+    middle.legend(frameon=False, loc="lower left", ncol=2)
+
+    # Indicator panel: one row per design choice, one column per specification.
+    rows = [
+        ("benchmark", "benchmark", ["sector", "dax", "market", "sector+market"]),
+        ("window", "window", ["(-1,1)", "(0,1)", "(0,5)", "(-5,5)"]),
+        ("estimation", "est_len", [250, 120]),
+        ("timing", "timing", ["announcement", "first_tradable"]),
+        ("event set", "dropped", ["-", "IAV"]),
+    ]
+    palette = ["#1f3b57", "#c8553d", "#b08d3f", "#3f6b4f"]
+    codes = np.zeros((len(rows), len(curve)), dtype=int)
+    for i, (label, column, values) in enumerate(rows):
+        mapping = {value: j for j, value in enumerate(values)}
+        codes[i] = [mapping[value] for value in curve[column]]
+    from matplotlib.colors import ListedColormap
+    bottom.imshow(
+        codes,
+        aspect="auto",
+        cmap=ListedColormap(palette[: max(len(row[2]) for row in rows)]),
+        interpolation="nearest",
+        extent=[-0.5, len(curve) - 0.5, len(rows) - 0.5, -0.5],
+    )
+    for boundary in range(8, len(curve), 8):
+        bottom.axvline(boundary - 0.5, color="white", lw=0.6, alpha=0.7)
+    bottom.set_yticks(range(len(rows)))
+    bottom.set_yticklabels([row[0] for row in rows])
+    bottom.set_ylim(len(rows) - 0.5, -0.5)
     bottom.set_xlabel("specifications, sorted by mean CAR")
-    bottom.legend(frameon=False, loc="lower left", ncol=2)
+    bottom.set_ylabel("design choice")
     fig.tight_layout()
     fig.savefig(path, dpi=200)
     plt.close(fig)
@@ -354,7 +382,7 @@ def main() -> None:
 
     sd_event = sigma * np.sqrt(3)
     bayes_rows = []
-    for prior in (0.01, 0.03, 0.10):
+    for prior in (0.01, 0.03, 0.05):
         result = bayes_mean(cars, np.full(len(cars), sd_event), prior)
         result.pop("draws")
         bayes_rows.append(result)
