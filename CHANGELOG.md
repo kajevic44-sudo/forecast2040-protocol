@@ -1,4 +1,13 @@
 # Changelog
+## v1.3.13, 26 November 2026
+- Corrected the event level Patell Z in P05. The statistics 1.78 and minus 4.09 are the standardised cumulative abnormal returns, not Patell Z. The event level Patell Z is the standardised cumulative abnormal return divided by the square root of the number of days in the window: 1.03 for Italdesign and minus 2.36 for Everllence. Section 5.2 now defines the event level statistic, and the executive summary, the confidence table, the key numbers table and section 6.2 report the corrected values. The Everllence event still rejects at five percent, with a two sided p value of about 0.018, so the conclusion is unchanged.
+- Corrected the count of post hoc extensions from three to four in the abstract and added the Bayesian prior as the fourth question in the introduction to section 6.7.
+- Added a peer placebo caveat after Table 8. Porsche SE is the controlling shareholder of Volkswagen AG and is not an independent peer. Excluding it widens the Everllence gap from 3.97 to 4.37 log points. With four firms the smallest possible one sided rank p value is 0.25, so the peer test is descriptive and is not a significance test.
+- Softened the interpretation of the peer placebo. It narrows the explanation to firm level news but does not separate financing from governance.
+- Added short citations for the 4 September restructuring agreement (Reuters 2026c), the January sale process (Bloomberg 2026a) and the event screen in Table 1.
+- Left aligned the Data availability section in the PDF and in the DOCX.
+- Rebuilt P05 as version 2.4: 46 pages and 47 references in the PDF, 52 pages in the DOCX rendering. The only numerical change is the event level Patell Z; every other estimate, test statistic, sample and conclusion is unchanged.
+- Updated the P05 data availability statement to tag v1.3.13 and added the peer returns file `data/model/p05_extras/peer_cars.csv` to the list.
 ## v1.3.12, 26 November 2026
 - Corrected ten statements in P05 that described differences between logarithmic returns as percentage points. The peer gaps are now reported in log points, the unit used by every table.
 - Added the number of valid randomisation draws to section 5.3: 7,511 of the 10,000 draws fall on three trading days and enter the distribution.
@@ -22,7 +31,7 @@
 - Fixed the PDF title metadata so that the file carries the paper title rather than a renderer placeholder, and improved the DOCX table builder so that header rows repeat, rows do not split and tables stay with their captions.
 - Updated the data availability statement to tag v1.3.10 and the public README to the version 2.2 results.
 ## v1.3.9, 25 November 2026
-- Corrected two event level statements in P05 so that they match the standardised statistics. The Italdesign three day reaction is now described as not significant at five percent, with a Patell statistic of 1.78, rather than as indistinguishable from zero. The Everllence reaction is now described as rejecting the null on its own, with a Patell statistic of minus 4.09, and the text states that a single event cannot separate the programme from other news in the window.
+- Corrected two event level statements in P05 so that they match the standardised statistics. The Italdesign three day reaction is now described as not significant at five percent, with a standardised cumulative abnormal return of 1.78 (the corresponding event level Patell Z is 1.03), rather than as indistinguishable from zero. The Everllence reaction is now described as rejecting the null on its own, with a standardised cumulative abnormal return of minus 4.09 (the corresponding event level Patell Z is minus 2.36), and the text states that a single event cannot separate the programme from other news in the window.
 - Updated the data availability tag to v1.3.9 and rebuilt the P05 PDF and DOCX, 30 pages and 42 references.
 ## v1.3.8, 25 November 2026
 - Corrected the P05 sector benchmark. The paper used EXV4.DE, which is the iShares STOXX Europe 600 Health Care UCITS ETF (DE), in place of EXV5.DE, the iShares STOXX Europe 600 Automobiles and Parts UCITS ETF (DE). The fund metadata is now stored with the price file and the analysis refuses a benchmark whose name does not contain Automobiles.
