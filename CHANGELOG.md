@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.16, 27 November 2026
+
+P05 version 2.5, final corrections after review. The Bayesian probability range is stated as 0.70 to 0.81 throughout. The abstract and the conclusion report the pre-specified Patell test and the post hoc GARCH model without ranking them. The limitations note that peer betas differ, so part of the measured gap may reflect beta heterogeneity. Figures 5 and 7 are called out in the body text. No data, table or result changes.
+
 ## v1.3.15, 27 November 2026
 
 P05 version 2.5, reference list correction. The entries for Good (2005) and Gorton and Schmid (2000) are placed in alphabetical order, and the data availability statement no longer names a release tag, so it stays correct for every later version. No result, table, figure or data file changes.
