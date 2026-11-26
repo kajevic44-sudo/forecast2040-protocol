@@ -1,5 +1,11 @@
 # Changelog
+
+## v1.3.14, 27 November 2026
+
+P05 version 2.5. The peer comparison is rebuilt on 23 European manufacturers and suppliers instead of three German firms, with the exact rank p, a leave-one-out check and a placebo in time. The event level inference is re-estimated with rolling and GARCH(1,1) variance models. The paper adds a power curve, a cumulative average path with a null band and a forest plot, extends the specification curve with an indicator panel, and replaces the 10 log point Bayesian prior with priors of 1, 3 and 5 log points. The raw Yahoo price files are no longer redistributed; the metadata files record the tickers, dates and hashes, and the scripts re-download the raw files if they are absent. The manuscript is 55 pages.
+
 ## v1.3.13, 26 November 2026
+
 - Corrected the event level Patell Z in P05. The statistics 1.78 and minus 4.09 are the standardised cumulative abnormal returns, not Patell Z. The event level Patell Z is the standardised cumulative abnormal return divided by the square root of the number of days in the window: 1.03 for Italdesign and minus 2.36 for Everllence. Section 5.2 now defines the event level statistic, and the executive summary, the confidence table, the key numbers table and section 6.2 report the corrected values. The Everllence event still rejects at five percent, with a two sided p value of about 0.018, so the conclusion is unchanged.
 - Corrected the count of post hoc extensions from three to four in the abstract and added the Bayesian prior as the fourth question in the introduction to section 6.7.
 - Added a peer placebo caveat after Table 8. Porsche SE is the controlling shareholder of Volkswagen AG and is not an independent peer. Excluding it widens the Everllence gap from 3.97 to 4.37 log points. With four firms the smallest possible one sided rank p value is 0.25, so the peer test is descriptive and is not a significance test.
