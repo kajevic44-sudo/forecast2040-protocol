@@ -693,9 +693,9 @@ Franks, Julian, and Colin Mayer. 2001. "Ownership and Control of German Corporat
 
 Fuller, Kathleen, Jeffry Netter, and Mike Stegemoller. 2002. "What Do Returns to Acquiring Firms Tell Us? Evidence from Firms That Make Many Acquisitions." Journal of Finance 57 (4): 1763-1793.
 
-Gorton, Gary, and Frank A. Schmid. 2000. "Universal Banking and the Performance of German Firms." Journal of Financial Economics 58 (1-2): 29-80.
-
 Good, Phillip I. 2005. Permutation, Parametric and Bootstrap Tests of Hypotheses. 3rd ed. New York: Springer.
+
+Gorton, Gary, and Frank A. Schmid. 2000. "Universal Banking and the Performance of German Firms." Journal of Financial Economics 58 (1-2): 29-80.
 
 Hite, Gailen L., James E. Owers, and Ronald C. Rogers. 1987. "The Market for Interfirm Asset Sales: Partial Sell-Offs and Total Liquidations." Journal of Financial Economics 18 (2): 229-252.
 

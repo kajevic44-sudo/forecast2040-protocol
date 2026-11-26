@@ -1,5 +1,9 @@
 # Changelog
 
+## v1.3.15, 27 November 2026
+
+P05 version 2.5, reference list correction. The entries for Good (2005) and Gorton and Schmid (2000) are placed in alphabetical order. No result, table, figure or data file changes.
+
 ## v1.3.14, 27 November 2026
 
 P05 version 2.5. The peer comparison is rebuilt on 23 European manufacturers and suppliers instead of three German firms, with the exact rank p, a leave-one-out check and a placebo in time. The event level inference is re-estimated with rolling and GARCH(1,1) variance models. The paper adds a power curve, a cumulative average path with a null band and a forest plot, extends the specification curve with an indicator panel, and replaces the 10 log point Bayesian prior with priors of 1, 3 and 5 log points. The raw Yahoo price files are no longer redistributed; the metadata files record the tickers, dates and hashes, and the scripts re-download the raw files if they are absent. The manuscript is 55 pages.
